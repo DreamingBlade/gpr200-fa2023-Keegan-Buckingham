@@ -42,16 +42,12 @@ int main() {
 	//Allocate space for + send vertex data to GPU.
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	unsigned int vao;
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
+	
 	//Tell vao to pull vertex data from vbo
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-	//Define position attribute (3 floats)
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (const void*)0);
-	glEnableVertexAttribArray(0);
-
+	createVAO(vertices, 3);
+	
 	//Vertex shader source
 	const char* vertexShaderSource = R"(
 	#version 450
@@ -70,23 +66,9 @@ int main() {
 	}
 	)";
 	
-	//Create a new vertex shader object
-	unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	//Supply the shader object with source code
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-	//Compile the shader object
-	glCompileShader(vertexShader);
+	createShader(GL_VERTEX_SHADER, vertexShaderSource);
 
-	//glCompileShader(vertexShader)
-    //...
-	int success;
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-	if (!success) {
-		//512 is an arbitrary length, but should be plenty of characters for our error message.
-		char infoLog[512];
-		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		printf("Failed to compile shader: %s", infoLog);
-	}
+	createShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
 
 
 	while (!glfwWindowShouldClose(window)) {
@@ -101,8 +83,13 @@ int main() {
 unsigned int createVAO(float* vertexData, int numVertices)
 {
 	unsigned int vao;
-	
 
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
+	//Define position attribute (3 floats)
+	glVertexAttribPointer(0, numVertices, GL_FLOAT, GL_FALSE, sizeof(vertexData) * 3, (const void*)0);
+	glEnableVertexAttribArray(0);
 
 	return vao;
 }
@@ -112,7 +99,23 @@ unsigned int createVAO(float* vertexData, int numVertices)
 // Returns id of the shader object
 unsigned int createShader(GLenum shaderType, const char* sourceCode)
 {
+	//Create a new vertex shader object
+	unsigned int shader = glCreateShader(shaderType);
+	//Supply the shader object with source code
+	glShaderSource(shader, 1, &sourceCode, NULL);
+	//Compile the shader object
+	glCompileShader(shader);
 
+	//glCompileShader(vertexShader)
+	//...
+	int success;
+	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+	if (!success) {
+		//512 is an arbitrary length, but should be plenty of characters for our error message.
+		char infoLog[512];
+		glGetShaderInfoLog(shader, 512, NULL, infoLog);
+		printf("Failed to compile shader: %s", infoLog);
+	}
 
-	return;
+	return shader;
 }
