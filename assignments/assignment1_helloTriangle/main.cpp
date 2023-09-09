@@ -15,12 +15,13 @@ unsigned int createShaderProgram(const char* vertexShaderSource, const char* fra
 
 int main() {
 
-	float vertices[9] = {
-		//x   //y   //z
-		-0.5, -0.5, 0.0, //Bottom left
-		 0.5, -0.5, 0.0, //Bottom right
-		 0.0,  0.5, 0.0, //Top center
+	float vertices[21] = {
+		//x   //y  //z   //r  //g  //b  //a
+		-0.5, -0.5, 0.0, 1.0, 0.0, 0.0, 1.0, //Bottom left
+		 0.5, -0.5, 0.0, 0.0, 1.0, 0.0, 1.0, //Bottom right
+		 0.0,  0.5, 0.0, 0.0, 0.0, 1.0, 1.0  //Top center
 	};
+
 
 	printf("Initializing...");
 	if (!glfwInit()) {
@@ -49,22 +50,25 @@ int main() {
 
 	//Vertex shader source
 	const char* vertexShaderSource = R"(
-	#version 450
-	layout(location = 0) in vec3 vPos;
-	void main(){
-		gl_Position = vec4(vPos, 1.0);
-	}
+		#version 450
+		layout(location = 0) in vec3 vPos;
+		layout(location = 1) in vec4 vColor;
+		out vec4 Color;
+		void main(){
+			Color = vColor;
+			gl_Position = vec4(vPos,1.0);
+		}
 	)";
 
 	//Fragment shader source
 	const char* fragmentShaderSource = R"(
-	#version 450
-	out vec4 FragColor;
-	void main(){
-		FragColor = vec4(1.0,1.0,1.0,1.0);
-	}
+		#version 450
+		out vec4 FragColor;
+		in vec4 Color;
+		void main(){
+			FragColor = Color;
+		}
 	)";
-	
 
 	unsigned int shader = createShaderProgram(vertexShaderSource, fragmentShaderSource);
 
@@ -97,10 +101,13 @@ unsigned int createVAO(float* vertexData, int numVertices)
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
-	//Define position attribute (3 floats)
-	glVertexAttribPointer(0, numVertices, GL_FLOAT, GL_FALSE,
-		sizeof(vertexData) * numVertices, (const void*)0);
+	//Position attribute
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (const void*)0);
 	glEnableVertexAttribArray(0);
+
+	//Color attribute
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (const void*)(sizeof(float) * 3));
+	glEnableVertexAttribArray(1);
 
 	return vao;
 }
