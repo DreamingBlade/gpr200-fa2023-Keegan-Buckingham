@@ -75,7 +75,7 @@ int main() {
 
 	unsigned int shader = createShaderProgram(vertexShaderSource, fragmentShaderSource);
 
-	unsigned int vao = createVAO(vertices, 3);
+	unsigned int vao = createVAO(vertices, 7);
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
@@ -108,11 +108,11 @@ unsigned int createVAO(float* vertexData, int numVertices)
 	glBindVertexArray(vao);
 
 	//Position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (const void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * numVertices, (const void*)0);
 	glEnableVertexAttribArray(0);
 
 	//Color attribute
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (const void*)(sizeof(float) * 3));
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(float) * numVertices, (const void*)(sizeof(float) * 3));
 	glEnableVertexAttribArray(1);
 
 	return vao;
