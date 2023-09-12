@@ -41,12 +41,7 @@ int main() {
 		return 1;
 	}
 
-	//Define a new buffer id
-	unsigned int vbo;
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	//Allocate space for + send vertex data to GPU.
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	
 
 	//Vertex shader source
 	const char* vertexShaderSource = R"(
@@ -106,6 +101,13 @@ unsigned int createVAO(float* vertexData, int numVertices)
 
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
+
+	//Define a new buffer id
+	unsigned int vbo;
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	//Allocate space for + send vertex data to GPU.
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 3 * numVertices, vertexData, GL_STATIC_DRAW);
 
 	//Position attribute
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * numVertices, (const void*)0);
