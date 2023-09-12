@@ -114,7 +114,7 @@ unsigned int createVAO(float* vertexData, int numVertices)
 	glEnableVertexAttribArray(0);
 
 	//Color attribute
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (const void*)(sizeof(float) * 3));
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (const void*)(sizeof(float) * numVertices));
 	glEnableVertexAttribArray(1);
 
 	return vao;
