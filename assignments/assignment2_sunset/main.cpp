@@ -25,35 +25,17 @@ const int SCREEN_WIDTH = 1080;
 const int SCREEN_HEIGHT = 720;
 
 Vertex vertices[4] = {
-	 //x     y    z   u  v
-	{-0.5, -0.5, 0.0, 0, 0}, //Bottom Left
-	{ 0.5, -0.5, 0.0, 1, 0}, //Bottom Right
-	{ 0.5,  0.5, 0.0, 1, 1}, //Top Right
-	{-0.5,  0.5, 0.0, 0, 1}, //Top Left
+	 //x     y     z   u  v
+	{-0.5, -0.5,  0.0, 0, 0}, //Bottom Left
+	{ 0.5, -0.5,  0.0, 1, 0}, //Bottom Right
+	{ 0.5,  0.5,  0.0, 1, 1}, //Top Right
+	{-0.5,  0.5,  0.0, 0, 1}, //Top Left
 };
 
 unsigned int indices[6] = {
-	-0.5, -0.5, 0.0, //Triangle 1
-	 0.5,  0.5, 0.0  //Triangle 2
+	 0, 1, 2, //Triangle 1
+	 2, 3, 0  //Triangle 2
 };
-
-const char* vertexShaderSource = R"(
-	#version 450
-	layout(location = 0) in vec3 vPos;
-	void main(){
-		gl_Position = vec4(vPos,1.0);
-	}
-)";
-
-const char* fragmentShaderSource = R"(
-	#version 450
-	out vec4 FragColor;
-	uniform vec3 _Color;
-	uniform float _Brightness;
-	void main(){
-		FragColor = vec4(_Color * _Brightness,1.0);
-	}
-)";
 
 float triangleColor[3] = { 1.0f, 0.5f, 0.0f };
 float triangleBrightness = 1.0f;
@@ -85,12 +67,9 @@ int main() {
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init();
 
-	std::string vertexShaderSource = kmb::loadShaderSourceFromFile("assets/vertexShader.vert");
-	std::string fragmentShaderSource = kmb::loadShaderSourceFromFile("assets/fragmentShader.frag");
 	kmb::Shader shader("assets/vertexShader.vert", "assets/fragmentShader.frag");
-	unsigned int vao = createVAO(vertices, 3, indices, 3);
+	unsigned int vao = createVAO(vertices, 4, indices, 6);
 
-	glBindVertexArray(vao);
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
@@ -99,6 +78,7 @@ int main() {
 
 		
 		shader.use();
+		shader.setInt("_MyFloat", 3);
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
 
@@ -137,16 +117,16 @@ unsigned int createVAO(Vertex* vertexData, int numVertices, unsigned int* indice
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	//Allocate space for + send vertex data to GPU.
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * numVertices * 3, vertexData, GL_STATIC_DRAW);
-
-	//Position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, x));
-	glEnableVertexAttribArray(0);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * numVertices * 6, vertexData, GL_STATIC_DRAW);
 
 	unsigned int ebo;
 	glGenBuffers(1, &ebo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * numIndices, indicesData, GL_STATIC_DRAW);
+
+	//Position attribute
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, x));
+	glEnableVertexAttribArray(0);
 
 	//UV
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)(offsetof(Vertex, u)));
