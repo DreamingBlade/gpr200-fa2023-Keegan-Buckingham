@@ -9,6 +9,7 @@
 #include <imgui_impl_opengl3.h>
 
 #include <kmb/shader.h>
+#include <kmb/texture.h>
 
 struct Vertex
 {
@@ -69,6 +70,14 @@ int main() {
 
 	kmb::Shader shader("assets/vertexShader.vert", "assets/fragmentShader.frag");
 	unsigned int vao = createVAO(vertices, 4, indices, 6);
+
+	//Example usage in main.cpp
+	unsigned int brickTexture = loadTexture("assets/brick.png", GL_REPEAT, GL_LINEAR);
+
+	//Bind to texture unit 0
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, brickTexture);
+
 
 
 	while (!glfwWindowShouldClose(window)) {

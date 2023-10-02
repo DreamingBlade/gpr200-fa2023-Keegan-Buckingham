@@ -1,17 +1,9 @@
 #version 450
-	out vec4 fragColor;
-	in vec2 UV;
-	void main(){
+out vec4 FragColor;
+in vec2 UV;
 
-		//Sunrise background colors
-		vec3 color = mix(vec3(1.0,1.0,0.0),vec3(0.9,0.0,0.5),UV.y);
-    
-		//Get 0-1 T value for hill shape
-		float hills = 1.0 - step(sin(UV.x*3.0) * 0.4 + 0.1,UV.y);
-    
-		//Blend dark grey hills
-		color = mix(color,vec3(0.2),hills);
+uniform sampler2D _Texture;
 
-		//Output to screen
-		fragColor = vec4(color,1.0);
-	}
+void main(){
+	FragColor = texture(_Texture,UV);
+}
