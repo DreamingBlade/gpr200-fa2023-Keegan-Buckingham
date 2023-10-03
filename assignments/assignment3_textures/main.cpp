@@ -105,10 +105,9 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT);
 		//Both use same quad mesh
 		glBindVertexArray(quadVAO);
-
-		float time = glfwGetTime();
-		backgroundShader.setFloat("iTime", time);
-		//characterShader.setFloat("iTime", time);
+ 
+		backgroundShader.setFloat("iTime", (float)glfwGetTime());
+		characterShader.setFloat("iTime", (float)glfwGetTime());
 		
 		//Draw background
 		backgroundShader.use();
