@@ -74,6 +74,7 @@ int main()
 
 	unsigned int brickTexture = loadTexture("assets/brick.png", GL_REPEAT, GL_LINEAR);
 	unsigned int noiseTexture = loadTexture("assets/noise.png", GL_REPEAT, GL_LINEAR);
+	unsigned int sadTexture = loadTexture("assets/sadface.png", GL_REPEAT, GL_LINEAR);
 	unsigned int characterTexture = loadTexture("assets/character.png", GL_CLAMP_TO_EDGE, GL_LINEAR);
 
 	//Place textureA in unit 0
@@ -82,15 +83,20 @@ int main()
 	//place noiseTexture in unit 1
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, noiseTexture);
-	//Place textureB in unit 2
+
 	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, sadTexture);
+
+	//Place textureB in unit 2
+	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, characterTexture);
 	
 	//Make sampler2D _BrickTexture sample from unit 0
 	backgroundShader.setInt("_BrickTexture", 0);
 	backgroundShader.setInt("_NoiseTexture", 1);
+	backgroundShader.setInt("_SadTexture", 2);
 	//Make sampler2D _CharacterTexture sample from unit 2
-	characterShader.setInt("_CharacterTexture", 2);
+	characterShader.setInt("_CharacterTexture", 3);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -99,6 +105,10 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT);
 		//Both use same quad mesh
 		glBindVertexArray(quadVAO);
+
+		float time = glfwGetTime();
+		backgroundShader.setFloat("iTime", time);
+		//characterShader.setFloat("iTime", time);
 		
 		//Draw background
 		backgroundShader.use();
@@ -107,12 +117,13 @@ int main()
 		//Make sampler2D _BrickTexture sample from unit 
 		backgroundShader.setInt("_BrickTexture", 0);
 		backgroundShader.setInt("_NoiseTexture", 1);
+		backgroundShader.setInt("_SadTexture", 2);
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 
 		characterShader.use();
 		glBindTexture(GL_TEXTURE_2D, characterTexture);
-		characterShader.setInt("_CharacterTexture", 2);
+		characterShader.setInt("_CharacterTexture", 3);
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

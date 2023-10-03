@@ -4,15 +4,24 @@ in vec2 UV;
 
 uniform sampler2D _BrickTexture;
 uniform sampler2D _NoiseTexture;
+uniform sampler2D _SadTexture;
 
-uniform int iTime;
+uniform float iTime;
 
 void main(){
 
-	float linear = sin(iTime);
-
-	float noise = texture(_NoiseTexture,UV*linear).r;
+	float noise = texture(_NoiseTexture,UV).r;
 	vec2 uv = UV + noise * 0.1f;
 
 	FragColor = texture(_BrickTexture,uv);
+	/*
+	float noise = texture(_NoiseTexture,UV).r;
+	vec2 uv = UV + noise * 0.1f;
+	vec4 colorA = texture(_BrickTexture,uv);
+	vec4 colorB = texture(_SadTexture,uv);
+
+	vec3 color = mix(colorA.rgb, colorB.rgb, colorB.a * 0.5);
+
+	FragColor = vec4(color,UV);
+	*/
 }

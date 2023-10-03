@@ -3,13 +3,7 @@ layout(location = 0) in vec3 vPos;
 layout(location = 1) in vec2 vUV;
 out vec2 UV;
 
-float time = 0f;
 void main(){
 	UV = vUV;
-	time+=.1f;
-	if(time> 2f)
-	{
-	time = 0f;
-	}
-	gl_Position = vec4(vPos,time);
+	gl_Position = vec4(vPos,2);
 }
