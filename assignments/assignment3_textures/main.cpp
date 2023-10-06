@@ -72,31 +72,26 @@ int main()
 
 	glBindVertexArray(quadVAO);
 
-	unsigned int brickTexture = loadTexture("assets/brick.png", GL_REPEAT, GL_LINEAR);
+	unsigned int grassTexture = loadTexture("assets/grass.jpg", GL_REPEAT, GL_LINEAR);
 	unsigned int noiseTexture = loadTexture("assets/noise.png", GL_REPEAT, GL_LINEAR);
-	unsigned int sadTexture = loadTexture("assets/sadface.png", GL_REPEAT, GL_LINEAR);
 	unsigned int characterTexture = loadTexture("assets/character.png", GL_CLAMP_TO_EDGE, GL_LINEAR);
 
-	//Place textureA in unit 0
+	//Place grass in unit 0
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, brickTexture);
+	glBindTexture(GL_TEXTURE_2D, grassTexture);
 	//place noiseTexture in unit 1
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, noiseTexture);
 
+	//Place character in unit 2
 	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, sadTexture);
-
-	//Place textureB in unit 2
-	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, characterTexture);
 	
 	//Make sampler2D _BrickTexture sample from unit 0
 	backgroundShader.setInt("_BrickTexture", 0);
 	backgroundShader.setInt("_NoiseTexture", 1);
-	backgroundShader.setInt("_SadTexture", 2);
 	//Make sampler2D _CharacterTexture sample from unit 2
-	characterShader.setInt("_CharacterTexture", 3);
+	characterShader.setInt("_CharacterTexture", 2);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -106,26 +101,27 @@ int main()
 		//Both use same quad mesh
 		glBindVertexArray(quadVAO);
  
-		backgroundShader.setFloat("iTime", (float)glfwGetTime());
-		characterShader.setFloat("iTime", (float)glfwGetTime());
-		
+		float timePassed = (float)glfwGetTime();
+
 		//Draw background
 		backgroundShader.use();
-		glBindTexture(GL_TEXTURE_2D, brickTexture);
+		backgroundShader.setFloat("iTime", timePassed);
+		glBindTexture(GL_TEXTURE_2D, grassTexture);
 		//setBackgroundShaderUniforms
 		//Make sampler2D _BrickTexture sample from unit 
-		backgroundShader.setInt("_BrickTexture", 0);
+		backgroundShader.setInt("_GrassTexture", 0);
 		backgroundShader.setInt("_NoiseTexture", 1);
-		backgroundShader.setInt("_SadTexture", 2);
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 
 		characterShader.use();
+		characterShader.setFloat("iTime", timePassed);
 		glBindTexture(GL_TEXTURE_2D, characterTexture);
-		characterShader.setInt("_CharacterTexture", 3);
+		characterShader.setInt("_CharacterTexture", 2);
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 
 		//Render UI
 		{

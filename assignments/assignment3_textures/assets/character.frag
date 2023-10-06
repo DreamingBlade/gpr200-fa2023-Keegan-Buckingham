@@ -7,6 +7,7 @@ uniform sampler2D _CharacterTexture;
 uniform float iTime;
 
 void main(){
+	vec2 uv = UV;
 
-	FragColor = texture(_CharacterTexture,UV);
+	FragColor = texture(_CharacterTexture,uv);
 }
