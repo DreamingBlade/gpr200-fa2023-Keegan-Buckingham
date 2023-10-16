@@ -63,9 +63,52 @@ namespace kmb {
 		ew::Vec3 scale = ew::Vec3(1.0f, 1.0f, 1.0f);
 		ew::Mat4 getModelMatrix() const {
 
-			return Translate(position) * Scale(scale) * RotateZ(rotation.z) *
+			return kmb::Translate(position) * kmb::Scale(scale) * RotateZ(rotation.z) *
 				RotateX(rotation.x) * RotateY(rotation.y);
 		};
+
+		//eye = eye (camera) position
+	//target = position to look at
+	//up = up axis, usually(0,1,0)
+		inline ew::Mat4 LookAt(ew::Vec3 eye, ew::Vec3 target, ew::Vec3 up) {
+			
+				//use ew::Cross for cross product!
+			return 
+				ew::Mat4(
+				1, 0, 0, -(eye.x),
+				0, 1, 0, -(eye.y),
+				0, 0, 1, -(eye.z),
+				0, 0, 0, 1
+			);
+
+		};
+		//Orthographic projection
+		inline ew::Mat4 Orthographic(float height, float aspect, float near, float far) {
+
+			float right = aspect/2;
+			float left = -right;
+			float top = height/2;
+			float bottom = - top;
+
+			return ew::Mat4{
+				2/(right-left),   0,   0,  -((right + left)/(right - left)),
+				0,  2/(top - bottom),  0,  -((top+bottom)/(top-bottom)),
+				0,  0,   -(2/(far-near)),  -((far+near)/(far-near)),
+				0,  0,  0,  1
+			};
+		};
+		//Perspective projection
+		//fov = vertical aspect ratio (radians)
+		inline ew::Mat4 Perspective(float fov, float aspect, float near, float far) {
+			
+			return ew::Mat4(
+				1/((tan(fov/2))*aspect), 0, 0, 0,
+				0, 1/(tan(fov/2)), 0, 0,
+				0, 0,  (near + far)/(near - far), (2 * far * near) / (near - far),
+				0, 0, -1,  0
+			);
+		};
+
 	};
 
 }

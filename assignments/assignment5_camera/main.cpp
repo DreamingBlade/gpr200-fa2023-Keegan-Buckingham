@@ -12,6 +12,11 @@
 #include <ew/procGen.h>
 #include <ew/transform.h>
 
+#include <kmb/transformations.h>
+#include <kmb/shader.h>
+#include <kmb/texture.h>
+#include <kmb/camera.h>
+
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 
 //Projection will account for aspect ratio!
@@ -54,7 +59,7 @@ int main() {
 	//Depth testing - required for depth sorting!
 	glEnable(GL_DEPTH_TEST);
 
-	ew::Shader shader("assets/vertexShader.vert", "assets/fragmentShader.frag");
+	kmb::Shader shader("assets/vertexShader.vert", "assets/fragmentShader.frag");
 	
 	//Cube mesh
 	ew::Mesh cubeMesh(ew::createCube(0.5f));
@@ -65,6 +70,14 @@ int main() {
 		cubeTransforms[i].position.x = i % (NUM_CUBES / 2) - 0.5;
 		cubeTransforms[i].position.y = i / (NUM_CUBES / 2) - 0.5;
 	}
+
+	kmb::Camera camera;
+	camera.position = ew::Vec3(0, 0, 5); //Looking down the -Z axis
+	camera.target = ew::Vec3(0, 0, 0);
+	camera.fov = 60;
+	camera.orthoSize = 6;
+	camera.nearPlane = 0.1;
+	camera.farPlane = 100;
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
