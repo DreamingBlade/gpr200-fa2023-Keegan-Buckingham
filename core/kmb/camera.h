@@ -1,5 +1,6 @@
 #include "../ew/ewMath/mat4.h"
 #include "../ew/ewMath/vec3.h"
+#include <kmb/transformations.h>
 
 namespace kmb {
 	struct Camera {
@@ -17,7 +18,14 @@ namespace kmb {
 		}
 		ew::Mat4 ProjectionMatrix() //View->Clip
 		{
-
+			if (orthographic)
+			{
+				return kmb::Orthographic(orthoSize, aspectRatio, nearPlane, farPlane);
+			}
+			else
+			{
+				return kmb::Perspective(fov, aspectRatio, nearPlane, farPlane);
+			}
 		}
 	};
 }
