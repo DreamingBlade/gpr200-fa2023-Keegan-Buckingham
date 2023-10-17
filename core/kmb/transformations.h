@@ -63,28 +63,19 @@ namespace kmb {
 	//up = up axis, usually(0,1,0)
 	inline ew::Mat4 LookAt(ew::Vec3 eye, ew::Vec3 target, ew::Vec3 up) {
 
-		ew::Vec3 f = ew::Cross(target, up);
-		ew::Vec3 r = ew::Cross(up, eye);
-		ew::Vec3 u = ew::Cross(target, eye);
+		ew::Vec3 f = ew::Normalize(eye - target);
+		ew::Vec3 r = ew::Normalize(ew::Cross(f, up));
+		ew::Vec3 u = ew::Normalize(ew::Cross(f, r));
 
-		//View Matrix
-
-		ew::Mat4 rotation(
-			r.x, r.y, r.z, 0,
-			u.x, u.y, u.z, 0,
-			f.x, f.y, f.z, 0,
-			0, 0, 0, 1
-		);
-
-		ew::Mat4 translation(
-			1, 0, 0, -eye.x,
-			0, 1, 0, -eye.y,
-			0, 0, 1, -eye.z,
+		ew::Mat4 viewMatrix(
+			r.x, r.y, r.z, -ew::Dot(r, eye),
+			u.x, u.y, u.z, -ew::Dot(u, eye),
+			f.x, f.y, f.z, -ew::Dot(f, eye),
 			0, 0, 0, 1
 		);
 
 		//use ew::Cross for cross product!
-		return rotation * translation;
+		return viewMatrix;
 
 	};
 
