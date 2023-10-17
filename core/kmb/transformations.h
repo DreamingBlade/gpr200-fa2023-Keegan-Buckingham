@@ -57,34 +57,37 @@ namespace kmb {
 		);
 	};
 
-	
-
-	struct Transform {
-		ew::Vec3 position = ew::Vec3(0.0f, 0.0f, 0.0f);
-		ew::Vec3 rotation = ew::Vec3(0.0f, 0.0f, 0.0f); //Euler angles (degrees)
-		ew::Vec3 scale = ew::Vec3(1.0f, 1.0f, 1.0f);
-		ew::Mat4 getModelMatrix() const {
-
-			return kmb::Translate(position) * kmb::Scale(scale) * RotateZ(rotation.z) *
-				RotateX(rotation.x) * RotateY(rotation.y);
-		};
-
-		
-	};
-
 	//Creates a right handed view space
 	//eye = eye (camera) position
 	//target = position to look at
 	//up = up axis, usually(0,1,0)
 	inline ew::Mat4 LookAt(ew::Vec3 eye, ew::Vec3 target, ew::Vec3 up) {
 
-		ew::Vec3 f = ew::Cross(eye, up);
+		ew::Vec3 f = ew::Cross(target, up);
+		ew::Vec3 r = ew::Cross(up, eye);
+		ew::Vec3 u = ew::Cross(target, eye);
 
+		//View Matrix
+
+		ew::Mat4 rotation(
+			r.x, r.y, r.z, 0,
+			u.x, u.y, u.z, 0,
+			f.x, f.y, f.z, 0,
+			0, 0, 0, 1
+		);
+
+		ew::Mat4 translation(
+			1, 0, 0, -eye.x,
+			0, 1, 0, -eye.y,
+			0, 0, 1, -eye.z,
+			0, 0, 0, 1
+		);
 
 		//use ew::Cross for cross product!
-		return ;
+		return rotation * translation;
 
 	};
+
 	//Orthographic projection
 	inline ew::Mat4 Orthographic(float height, float aspect, float near, float far) {
 
@@ -100,6 +103,7 @@ namespace kmb {
 			0,  0,  0,  1
 		};
 	};
+
 	//Perspective projection
 	//fov = vertical aspect ratio (radians)
 	inline ew::Mat4 Perspective(float fov, float aspect, float near, float far) {
@@ -110,5 +114,18 @@ namespace kmb {
 			0, 0, -1, 0
 		);
 	};
+
+	struct Transform {
+		ew::Vec3 position = ew::Vec3(0.0f, 0.0f, 0.0f);
+		ew::Vec3 rotation = ew::Vec3(0.0f, 0.0f, 0.0f); //Euler angles (degrees)
+		ew::Vec3 scale = ew::Vec3(1.0f, 1.0f, 1.0f);
+		ew::Mat4 getModelMatrix() const {
+
+			return kmb::Translate(position) * kmb::Scale(scale) * RotateZ(rotation.z) *
+				RotateX(rotation.x) * RotateY(rotation.y);
+		};
+	};
+
+	
 
 }

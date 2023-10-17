@@ -1,6 +1,8 @@
+#pragma once
+
 #include "../ew/ewMath/mat4.h"
 #include "../ew/ewMath/vec3.h"
-#include <kmb/transformations.h>
+#include "transformations.h"
 
 namespace kmb {
 	struct Camera {
@@ -14,7 +16,8 @@ namespace kmb {
 		float orthoSize; //Height of orthographic frustum
 		ew::Mat4 ViewMatrix() //World->View
 		{
-
+			ew::Vec3 up(0, 1, 0);
+			return kmb::LookAt(position, target, up);
 		}
 		ew::Mat4 ProjectionMatrix() //View->Clip
 		{
