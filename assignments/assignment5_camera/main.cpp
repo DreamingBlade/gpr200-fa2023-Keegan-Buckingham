@@ -79,6 +79,7 @@ int main() {
 	camera.nearPlane = 0.1;
 	camera.farPlane = 100;
 	camera.orthographic = false;
+	camera.aspectRatio = static_cast<float>(SCREEN_WIDTH)/static_cast<float>(SCREEN_HEIGHT);
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();

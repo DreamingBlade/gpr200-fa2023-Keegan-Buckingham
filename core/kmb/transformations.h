@@ -64,7 +64,7 @@ namespace kmb {
 	inline ew::Mat4 LookAt(ew::Vec3 eye, ew::Vec3 target, ew::Vec3 up) {
 
 		ew::Vec3 f = ew::Normalize(eye - target);
-		ew::Vec3 r = ew::Normalize(ew::Cross(f, up));
+		ew::Vec3 r = ew::Normalize(ew::Cross(up, f));
 		ew::Vec3 u = ew::Normalize(ew::Cross(f, r));
 
 		ew::Mat4 viewMatrix(
@@ -82,7 +82,7 @@ namespace kmb {
 	//Orthographic projection
 	inline ew::Mat4 Orthographic(float height, float aspect, float near, float far) {
 
-		float right = aspect / 2;
+		float right = (aspect * height) / 2;
 		float left = -right;
 		float top = height / 2;
 		float bottom = -top;
@@ -98,6 +98,9 @@ namespace kmb {
 	//Perspective projection
 	//fov = vertical aspect ratio (radians)
 	inline ew::Mat4 Perspective(float fov, float aspect, float near, float far) {
+
+		fov = fov * (3.14159265358979323846f / 180);
+
 		return ew::Mat4(
 			1 / ((tan(fov / 2)) * aspect), 0, 0, 0,
 			0, 1 / (tan(fov / 2)), 0, 0,
