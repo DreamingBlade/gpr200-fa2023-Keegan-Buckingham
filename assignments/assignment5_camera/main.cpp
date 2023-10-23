@@ -18,7 +18,7 @@
 #include <kmb/camera.h>
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
-void moveCamera(GLFWwindow* window, kmb::Camera* camera, kmb::CameraControls* controls);
+void moveCamera(GLFWwindow* window, kmb::Camera* camera, kmb::CameraControls* controls, float deltaTime);
 
 //Projection will account for aspect ratio!
 const int SCREEN_WIDTH = 1080;
@@ -83,10 +83,19 @@ int main() {
 	camera.aspectRatio = static_cast<float>(SCREEN_WIDTH)/static_cast<float>(SCREEN_HEIGHT);
 
 	kmb::CameraControls cameraControls;
-	while (!glfwWindowShouldClose(window))
-	{
+	//main.cpp
+	float prevTime =0; //Timestamp of previous frame
+	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
-		moveCamera(window, &camera, &cameraControls);
+
+		//Calculate deltaTime
+		float time = (float)glfwGetTime(); //Timestamp of current frame
+		float deltaTime = time - prevTime;
+		prevTime = time;
+
+		//Pass deltaTime into moveCamera. Update this function to include a 4th parameter.
+		moveCamera(window, &camera, &cameraControls, deltaTime);
+
 
 		glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
 		//Clear both color buffer AND depth buffer
@@ -134,7 +143,7 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 	glViewport(0, 0, width, height);
 }
 
-void moveCamera(GLFWwindow* window, kmb::Camera* camera, kmb::CameraControls* controls)
+void moveCamera(GLFWwindow* window, kmb::Camera* camera, kmb::CameraControls* controls, float deltaTime)
 {
 	//If right mouse is not held, release cursor and return early.
 	if (!glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2))
@@ -164,8 +173,8 @@ void moveCamera(GLFWwindow* window, kmb::Camera* camera, kmb::CameraControls* co
 	double mouseDeltaX = mouseX - controls->prevMouseX;
 	double mouseDeltaY = mouseY - controls->prevMouseY;
 	//TODO: Add to yaw and pitch
-	controls->pitch = sin(mouseDeltaY)/cos(mouseDeltaY);
-	controls->yaw = sin(mouseDeltaX)/cos(mouseDeltaX);
+	controls->pitch += sin(mouseDeltaY)/cos(mouseDeltaY);
+	controls->yaw += sin(mouseDeltaX)/cos(mouseDeltaX);
 	//TODO: Clamp pitch between -89 and 89 degrees
 	if (controls->pitch >= 89)
 	{
@@ -179,25 +188,30 @@ void moveCamera(GLFWwindow* window, kmb::Camera* camera, kmb::CameraControls* co
 	//Remember previous mouse position
 	controls->prevMouseX = mouseX;
 	controls->prevMouseY = mouseY;
-
+	
 	//Construct forward vector using yaw and pitch. Don't forget to convert to radians!
-	ew::Vec3 forward = (cos(controls->yaw*180/3.14) * cos(controls->pitch * 180 / 3.14), sin(controls->pitch * 180 / 3.14), sin(controls->yaw * 180 / 3.14)*cos(controls->pitch * 180 / 3.14));
+	ew::Vec3 forward = ew::Vec3(cos(controls->yaw*180/3.14) * cos(controls->pitch * 180 / 3.14), sin(controls->pitch * 180 / 3.14), sin(controls->yaw * 180 / 3.14)*cos(controls->pitch * 180 / 3.14));
+	forward = ew::Normalize(forward);
 	//By setting target to a point in front of the camera along its forward direction, our LookAt will be updated accordingly when rendering.
-	camera->target = camera->position + forward;
+	//camera->target = camera->position + forward;
 
-	//moveCamera...
-//TODO: Using camera forward and world up (0,1,0), construct camera right and up vectors. Graham-schmidt process!
-	ew::Vec3 right = (0, 0, 0);
-	ew::Vec3 up = (0, 0, 0);
-	//TODO: Keyboard controls for moving along forward, back, right, left, up, and down. See Requirements for key mappings.
-	//EXAMPLE: Moving along forward axis if W is held.
-	//Note that this is framerate dependent, and will be very fast until you scale by deltaTime. See the next section.
-	if (glfwGetKey(window, GLFW_KEY_W)) {
-		camera->position += forward * controls->moveSpeed;
-	}
-
+ //   //TODO: Using camera forward and world up (0,1,0), construct camera right and up vectors. Graham-schmidt process!
+	//ew::Vec3 right = (0, 0, 0);
+	//ew::Vec3 up = (0, 0, 0);
+	////TODO: Keyboard controls for moving along forward, back, right, left, up, and down. See Requirements for key mappings.
+	////EXAMPLE: Moving along forward axis if W is held.
+	////Note that this is framerate dependent, and will be very fast until you scale by deltaTime. See the next section.
+	//if (glfwGetKey(window, GLFW_KEY_W)) {
+	//	camera->position += forward * controls->moveSpeed;
+	//}
+	//if (glfwGetKey(window, GLFW_KEY_D)) {
+	//	camera->position += right * controls->moveSpeed;
+	//}
+	//if (glfwGetKey(window, GLFW_KEY_Q)) {
+	//	camera->position += up * controls->moveSpeed;
+	//}
 	//Setting camera.target should be done after changing position. Otherwise, it will use camera.position from the previous frame and lag behind
-	camera->target = camera->position + forward;
+	camera->target = camera->position + forward ;
 
 }
 
