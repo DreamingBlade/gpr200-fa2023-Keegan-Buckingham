@@ -73,7 +73,7 @@ int main() {
 	}
 
 	kmb::Camera camera;
-	camera.position = ew::Vec3(0, 0, 5); //Looking down the -Z axis
+	camera.position = ew::Vec3(0, 0, -5); //Looking down the -Z axis
 	camera.target = ew::Vec3(0, 0, 0);
 	camera.fov = 60;
 	camera.orthoSize = 6;
@@ -81,6 +81,10 @@ int main() {
 	camera.farPlane = 100;
 	camera.orthographic = false;
 	camera.aspectRatio = static_cast<float>(SCREEN_WIDTH)/static_cast<float>(SCREEN_HEIGHT);
+
+	ew::Vec3 startPosition = camera.position;
+	ew::Vec3 targetStartPosition = camera.target;
+	
 
 	kmb::CameraControls cameraControls;
 	//main.cpp
@@ -95,7 +99,6 @@ int main() {
 
 		//Pass deltaTime into moveCamera. Update this function to include a 4th parameter.
 		moveCamera(window, &camera, &cameraControls, deltaTime);
-
 
 		glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
 		//Clear both color buffer AND depth buffer
@@ -127,6 +130,16 @@ int main() {
 			ImGui::Checkbox("Orthographic", &camera.orthographic);
 			ImGui::DragFloat("Field of view", &camera.fov, 0.05f);
 			ImGui::DragFloat("Orthographic Height", &camera.orthoSize, 0.05f);
+			ImGui::DragFloat("Near Plane", &camera.nearPlane, 0.05f);
+			ImGui::DragFloat("Far Plane", &camera.farPlane, 0.05f);
+			if (ImGui::Button("Reset"))
+			{
+				camera.position = startPosition;
+				camera.target = targetStartPosition;
+				cameraControls.yaw = cameraControls.startYaw;
+				cameraControls.pitch = cameraControls.startPitch;
+			}
+
 			ImGui::End();
 			
 			ImGui::Render();
@@ -173,8 +186,11 @@ void moveCamera(GLFWwindow* window, kmb::Camera* camera, kmb::CameraControls* co
 	double mouseDeltaX = mouseX - controls->prevMouseX;
 	double mouseDeltaY = mouseY - controls->prevMouseY;
 	//TODO: Add to yaw and pitch
-	controls->pitch += sin(mouseDeltaY)/cos(mouseDeltaY);
-	controls->yaw += sin(mouseDeltaX)/cos(mouseDeltaX);
+	//controls->pitch += sin(mouseDeltaY)/cos(mouseDeltaY);
+	//controls->yaw += sin(mouseDeltaX)/cos(mouseDeltaX);
+
+	controls->pitch += (mouseY - controls->prevMouseY) * controls->mouseSensitivity;
+	controls->yaw += (mouseX - controls->prevMouseX) * controls->mouseSensitivity;
 	//TODO: Clamp pitch between -89 and 89 degrees
 	if (controls->pitch >= 89)
 	{
@@ -190,28 +206,42 @@ void moveCamera(GLFWwindow* window, kmb::Camera* camera, kmb::CameraControls* co
 	controls->prevMouseY = mouseY;
 	
 	//Construct forward vector using yaw and pitch. Don't forget to convert to radians!
-	ew::Vec3 forward = ew::Vec3(cos(controls->yaw*180/3.14) * cos(controls->pitch * 180 / 3.14), sin(controls->pitch * 180 / 3.14), sin(controls->yaw * 180 / 3.14)*cos(controls->pitch * 180 / 3.14));
+	//ew::Vec3 forward = ew::Vec3((cos(controls->yaw) * cos(controls->pitch)) * 180 / 3.14, (sin(controls->pitch )) * 180 / 3.14, (sin(controls->yaw )*cos(controls->pitch)) * 180 / 3.14);
+	ew::Vec3 forward = ew::Vec3(controls->yaw * 180 / 3.14, controls->pitch * 180 / 3.14, -camera->target.z);
 	forward = ew::Normalize(forward);
 	//By setting target to a point in front of the camera along its forward direction, our LookAt will be updated accordingly when rendering.
-	//camera->target = camera->position + forward;
+	
 
- //   //TODO: Using camera forward and world up (0,1,0), construct camera right and up vectors. Graham-schmidt process!
-	//ew::Vec3 right = (0, 0, 0);
-	//ew::Vec3 up = (0, 0, 0);
-	////TODO: Keyboard controls for moving along forward, back, right, left, up, and down. See Requirements for key mappings.
-	////EXAMPLE: Moving along forward axis if W is held.
-	////Note that this is framerate dependent, and will be very fast until you scale by deltaTime. See the next section.
-	//if (glfwGetKey(window, GLFW_KEY_W)) {
-	//	camera->position += forward * controls->moveSpeed;
-	//}
-	//if (glfwGetKey(window, GLFW_KEY_D)) {
-	//	camera->position += right * controls->moveSpeed;
-	//}
-	//if (glfwGetKey(window, GLFW_KEY_Q)) {
-	//	camera->position += up * controls->moveSpeed;
-	//}
+    //TODO: Using camera forward and world up (0,1,0), construct camera right and up vectors. Graham-schmidt process!
+	ew::Vec3 right = ew::Vec3(1, 0, 0);
+	ew::Vec3 up = ew::Vec3(0, 1, 0);
+
+	ew::Vec3 f = ew::Normalize(ew::Vec3((cos(controls->yaw) * cos(controls->pitch)) * 180 / 3.14, (sin(controls->pitch)) * 180 / 3.14, (sin(controls->yaw) * cos(controls->pitch)) * 180 / 3.14));
+	ew::Vec3 r = ew::Normalize(ew::Cross(f, up));
+	ew::Vec3 u = ew::Normalize(ew::Cross(r,f));
+	//TODO: Keyboard controls for moving along forward, back, right, left, up, and down. See Requirements for key mappings.
+	//EXAMPLE: Moving along forward axis if W is held.
+	//Note that this is framerate dependent, and will be very fast until you scale by deltaTime. See the next section.
+	if (glfwGetKey(window, GLFW_KEY_W)) {
+		camera->position += r * controls->moveSpeed * deltaTime;
+	}
+	if (glfwGetKey(window, GLFW_KEY_S)) {
+		camera->position -= r * controls->moveSpeed * deltaTime;
+	}
+	if (glfwGetKey(window, GLFW_KEY_D)) {
+		camera->position += f * controls->moveSpeed * deltaTime;
+	}
+	if (glfwGetKey(window, GLFW_KEY_A)) {
+		camera->position -= f * controls->moveSpeed * deltaTime;
+	}
+	if (glfwGetKey(window, GLFW_KEY_Q)) {
+		camera->position += u * controls->moveSpeed * deltaTime;
+	}
+	if (glfwGetKey(window, GLFW_KEY_E)) {
+		camera->position -= u * controls->moveSpeed * deltaTime;
+	}
+
 	//Setting camera.target should be done after changing position. Otherwise, it will use camera.position from the previous frame and lag behind
-	camera->target = camera->position + forward ;
-
+	camera->target = camera->position + forward;
+	
 }
-
