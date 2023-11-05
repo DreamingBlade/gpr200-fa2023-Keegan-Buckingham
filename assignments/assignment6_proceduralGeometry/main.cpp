@@ -14,6 +14,7 @@
 #include <ew/transform.h>
 #include <ew/camera.h>
 #include <ew/cameraController.h>
+#include <kmb/procGen.h>
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 void resetCamera(ew::Camera& camera, ew::CameraController& cameraController);
@@ -85,6 +86,35 @@ int main() {
 	//Initialize transforms
 	ew::Transform cubeTransform;
 
+	ew::MeshData sphereMeshData = kmb::createSphere(0.5f, 64);
+
+	//Create mesh renderer
+	ew::Mesh sphereMesh(sphereMeshData);
+
+	//Initialize transform
+	ew::Transform sphereTransform;
+	sphereTransform.position = ew::Vec3(1.0f, 0.0f, 0.0f);
+
+	ew::MeshData cylinderMeshData = kmb::createCylinder(1.5f, 0.5f, 64);
+
+	//Create mesh renderer
+	ew::Mesh cylinderMesh(cylinderMeshData);
+
+	//Initialize transform
+	ew::Transform cylinderTransform;
+	cylinderTransform.position = ew::Vec3(2.0f, 0.0f, 0.0f);
+
+	ew::MeshData planeMeshData = kmb::createPlane(0.5f, 0.5f, 64);
+
+	//Create mesh renderer
+	ew::Mesh planeMesh(planeMeshData);
+
+	//Initialize transform
+	ew::Transform planeTransform;
+	planeTransform.position = ew::Vec3(-1.0f, 0.0f, 0.0f);
+
+
+
 	resetCamera(camera,cameraController);
 
 	while (!glfwWindowShouldClose(window)) {
@@ -103,8 +133,6 @@ int main() {
 		//Clear both color buffer AND depth buffer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		
-
 		shader.use();
 		glBindTexture(GL_TEXTURE_2D, brickTexture);
 		shader.setInt("_Texture", 0);
@@ -120,6 +148,18 @@ int main() {
 		//Draw cube
 		shader.setMat4("_Model", cubeTransform.getModelMatrix());
 		cubeMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
+
+		//Draw Sphere
+		shader.setMat4("_Model", sphereTransform.getModelMatrix());
+		sphereMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
+		
+		//Draw Cylinder
+		shader.setMat4("_Model", cylinderTransform.getModelMatrix());
+		cylinderMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
+
+		//Draw Plane
+		shader.setMat4("_Model", planeTransform.getModelMatrix());
+		planeMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
 
 		//Render UI
 		{

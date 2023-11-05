@@ -6,8 +6,57 @@ namespace kmb {
 	{
 		ew::MeshData sphere;
 
-		return sphere;
+		float thetaStep = (2 * 3.1415) / numSegments;
+		float phiStep = 3.1415 / numSegments;
 
+		for (int row = 0; row <= numSegments; row++)
+		{
+			//First and last row converge at poles
+			float phi = row * phiStep;
+
+			//Duplicate column for each row
+			for (int col = 0; col <= numSegments; col++)
+			{
+				float theta = col * thetaStep;
+
+				ew::Vertex v;
+
+				v.pos = ew::Vec3(radius * cos(theta) * sin(phi), radius * cos(phi), radius * sin(theta) * sin(phi));
+
+				sphere.vertices.push_back(v);
+			}
+		}
+
+		int poleStart = 0;
+		int sideStart = numSegments + 1;
+
+		for (int i = 0; i < numSegments; i++)
+		{
+			sphere.indices.push_back(sideStart + i);
+			sphere.indices.push_back(poleStart + i);
+			sphere.indices.push_back(sideStart + i + 1);
+		}
+
+		int columns = numSegments + 1;
+		//Skip top and bottom poles
+		for (int row = 1; row < numSegments - 1; row++)
+		{
+			for (int col = 0; col < numSegments; col++)
+			{
+				int start = row * columns + col;
+
+				//Triangle 1
+				sphere.indices.push_back(start);
+				sphere.indices.push_back(start + 1);
+				sphere.indices.push_back(start + columns);
+
+				//Triangle 2
+				sphere.indices.push_back(start + columns);
+				sphere.indices.push_back(start + columns + 1);
+				sphere.indices.push_back(start + 1);
+			}
+		}
+		return sphere;
 	}
 
 	ew::MeshData createCylinder(float height, float radius, int numSegments)
@@ -25,31 +74,25 @@ namespace kmb {
 		//Top ring
 		float thetaStep = 2 * 3.1415 / numSegments;
 
-		for (i = 0; i <= numSegments; i++)
+		for (int i = 0; i <= numSegments; i++)
 		{
 			float theta = i * thetaStep;
 			ew::Vertex v;
-			v.x = cos(theta) * radius;
-			v.z = sin(theta) * radius;
-			v.y = topY;
 
-			v.pos = ew::Vec3(v.x,v.z,v.y);
+			v.pos = ew::Vec3(cos(theta) * radius, topY, sin(theta) * radius);
 			
-			cylinder.push_back(v);
+			cylinder.vertices.push_back(v);
 		}
 
 		//Bottom ring
-		for (i = 0; i <= numSegments; i++)
+		for (int i = 0; i <= numSegments; i++)
 		{
 			float theta = i * thetaStep;
 			ew::Vertex v;
-			v.x = cos(theta) * radius;
-			v.z = sin(theta) * radius;
-			v.y = bottomY;
 
-			v.pos = ew::Vec3(v.x, v.z, v.y);
+			v.pos = ew::Vec3(cos(theta) * radius, bottomY, sin(theta) * radius);
 
-			cylinder.push_back(v);
+			cylinder.vertices.push_back(v);
 		}
 
 		//Bottom center
@@ -69,10 +112,10 @@ namespace kmb {
 		}
 
 		//Bottom Cap
-		int start = 1;
-		int center = 0;
+		start = numSegments + 1;
+		center = cylinder.vertices.size() - 1;
 
-		for (int = 0; i <= numSegments; i++)
+		for (int i = 0; i <= numSegments; i++)
 		{
 			cylinder.indices.push_back(start + i);
 			cylinder.indices.push_back(center);
