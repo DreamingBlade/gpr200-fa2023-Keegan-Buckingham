@@ -95,7 +95,7 @@ int main() {
 	ew::Transform sphereTransform;
 	sphereTransform.position = ew::Vec3(1.0f, 0.0f, 0.0f);
 
-	ew::MeshData cylinderMeshData = kmb::createCylinder(1.5f, 0.5f, 64);
+	ew::MeshData cylinderMeshData = kmb::createCylinder(2.0f, 0.5f, 64);
 
 	//Create mesh renderer
 	ew::Mesh cylinderMesh(cylinderMeshData);

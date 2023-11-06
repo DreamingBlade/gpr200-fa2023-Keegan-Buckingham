@@ -46,8 +46,8 @@ namespace kmb {
 				int start = row * columns + col;
 
 				//Triangle 1
-				sphere.indices.push_back(start);
 				sphere.indices.push_back(start + 1);
+				sphere.indices.push_back(start);
 				sphere.indices.push_back(start + columns);
 
 				//Triangle 2
@@ -123,6 +123,23 @@ namespace kmb {
 		}
 
 		//Sides
+		int sideStart = 1;
+
+		int columns = numSegments + 1;
+
+		for (int i = 0; i < columns; i++)
+		{
+			start = sideStart + i;
+			//Triangle 1
+			cylinder.indices.push_back(start + 1);
+			cylinder.indices.push_back(start);
+			cylinder.indices.push_back(start + columns);
+
+			//Triangle 2
+			cylinder.indices.push_back(start + columns);
+			cylinder.indices.push_back(start + columns + 1);
+			cylinder.indices.push_back(start + 1);
+		}
 
 		return cylinder;
 	}
