@@ -23,6 +23,9 @@ namespace kmb {
 
 				v.pos = ew::Vec3(radius * cos(theta) * sin(phi), radius * cos(phi), radius * sin(theta) * sin(phi));
 
+				//v.normal = normal;
+				v.uv = ew::Vec2(col/numSegments, row/numSegments);
+
 				sphere.vertices.push_back(v);
 			}
 		}
@@ -56,6 +59,17 @@ namespace kmb {
 				sphere.indices.push_back(start + 1);
 			}
 		}
+
+		//bottom cap
+		 poleStart = sphere.vertices.size();
+		 sideStart = numSegments + 1;
+		for (int i = 0; i < numSegments; i++)
+		{
+			sphere.indices.push_back(sideStart - 1);
+			sphere.indices.push_back(poleStart - i);
+			sphere.indices.push_back(sideStart - i - 1);
+		}
+
 		return sphere;
 	}
 
@@ -147,13 +161,21 @@ namespace kmb {
 	ew::MeshData createPlane(float width, float height, int subdivisions)
 	{
 		ew::MeshData plane;
+
 		//Getting plane vertices
 		for (int row = 0; row <= subdivisions; row++)
 		{
 			for (int col = 0; col <= subdivisions; col++)
 			{
+
+				ew::Vec3 normal = ew::Vec3((- 1.0 + (col / subdivisions)), -1.0 + (row / subdivisions)*2, 0);
+				ew::Vec3 a = ew::Vec3(normal.z, normal.x, normal.y);
+				ew::Vec3 b = ew::Cross(normal ,a);
+
 				ew::Vertex v;
 				v.pos = ew::Vec3(width * (col / subdivisions), 0, -height * (row / subdivisions));
+				v.normal = ew::Vec3 (0,1,0);
+				v.uv = ew::Vec2((col / subdivisions), (row / subdivisions));
 				plane.vertices.push_back(v);
 			}
 		}
