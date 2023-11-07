@@ -86,7 +86,7 @@ int main() {
 	//Initialize transforms
 	ew::Transform cubeTransform;
 
-	ew::MeshData sphereMeshData = kmb::createSphere(0.5f, 10);
+	ew::MeshData sphereMeshData = kmb::createSphere(0.5f, 16);
 
 	//Create mesh renderer
 	ew::Mesh sphereMesh(sphereMeshData);

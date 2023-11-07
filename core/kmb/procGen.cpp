@@ -22,9 +22,8 @@ namespace kmb {
 				ew::Vertex v;
 
 				v.pos = ew::Vec3(radius * cos(theta) * sin(phi), radius * cos(phi), radius * sin(theta) * sin(phi));
-
-				//v.normal = normal;
-				v.uv = ew::Vec2(col/numSegments, row/numSegments);
+				v.normal = ew::Normalize(ew::Vec3(v.pos.x, v.pos.y, v.pos.z));
+				v.uv = ew::Vec2((float)(theta), (float)(phi));
 
 				sphere.vertices.push_back(v);
 			}
@@ -61,13 +60,13 @@ namespace kmb {
 		}
 
 		//bottom cap
-		 poleStart = sphere.vertices.size();
-		 sideStart = numSegments + 1;
+		poleStart = sphere.vertices.size()-numSegments;
+		sideStart = sphere.vertices.size() - (numSegments) - 1;
 		for (int i = 0; i < numSegments; i++)
 		{
 			sphere.indices.push_back(sideStart - 1);
-			sphere.indices.push_back(poleStart - i);
-			sphere.indices.push_back(sideStart - i - 1);
+			sphere.indices.push_back(poleStart - i - 1);
+			sphere.indices.push_back(sideStart - i- 1);
 		}
 
 		return sphere;
@@ -83,6 +82,7 @@ namespace kmb {
 		//Top center
 		ew::Vertex topVertex;
 		topVertex.pos = ew::Vec3(0, topY, 0);
+		topVertex.normal = ew::Normalize(ew::Vec3(topVertex.pos.x, topVertex.pos.y, topVertex.pos.z));
 		cylinder.vertices.push_back(topVertex);
 
 		//Top ring
@@ -94,6 +94,9 @@ namespace kmb {
 			ew::Vertex v;
 
 			v.pos = ew::Vec3(cos(theta) * radius, topY, sin(theta) * radius);
+
+			v.normal = ew::Normalize(ew::Vec3(v.pos.x, v.pos.y, v.pos.z));
+			//v.uv = ew::Vec2((float)(theta), (float)(phi));
 			
 			cylinder.vertices.push_back(v);
 		}
@@ -105,13 +108,14 @@ namespace kmb {
 			ew::Vertex v;
 
 			v.pos = ew::Vec3(cos(theta) * radius, bottomY, sin(theta) * radius);
-
+			v.normal = ew::Normalize(ew::Vec3(v.pos.x, v.pos.y, v.pos.z));
 			cylinder.vertices.push_back(v);
 		}
 
 		//Bottom center
 		ew::Vertex bottomVertex;
 		bottomVertex.pos = ew::Vec3(0, bottomY, 0);
+		bottomVertex.normal = ew::Normalize(ew::Vec3(bottomVertex.pos.x, bottomVertex.pos.y, bottomVertex.pos.z));
 		cylinder.vertices.push_back(bottomVertex);
 
 		//Top Cap
