@@ -83,6 +83,7 @@ namespace kmb {
 		ew::Vertex topVertex;
 		topVertex.pos = ew::Vec3(0, topY, 0);
 		topVertex.normal = ew::Normalize(ew::Vec3(topVertex.pos.x, topVertex.pos.y, topVertex.pos.z));
+		topVertex.uv = ew::Vec2(0, 1);
 		cylinder.vertices.push_back(topVertex);
 
 		//Top ring
@@ -94,10 +95,8 @@ namespace kmb {
 			ew::Vertex v;
 
 			v.pos = ew::Vec3(cos(theta) * radius, topY, sin(theta) * radius);
-
 			v.normal = ew::Normalize(ew::Vec3(v.pos.x, v.pos.y, v.pos.z));
-			//v.uv = ew::Vec2((float)(theta), (float)(phi));
-			
+			v.uv = ew::Vec2(v.pos.x, v.pos.y);
 			cylinder.vertices.push_back(v);
 		}
 
@@ -109,6 +108,7 @@ namespace kmb {
 
 			v.pos = ew::Vec3(cos(theta) * radius, bottomY, sin(theta) * radius);
 			v.normal = ew::Normalize(ew::Vec3(v.pos.x, v.pos.y, v.pos.z));
+			v.uv = ew::Vec2(v.pos.x, v.pos.y);
 			cylinder.vertices.push_back(v);
 		}
 
@@ -116,6 +116,7 @@ namespace kmb {
 		ew::Vertex bottomVertex;
 		bottomVertex.pos = ew::Vec3(0, bottomY, 0);
 		bottomVertex.normal = ew::Normalize(ew::Vec3(bottomVertex.pos.x, bottomVertex.pos.y, bottomVertex.pos.z));
+		bottomVertex.uv = ew::Vec2(0, -0);
 		cylinder.vertices.push_back(bottomVertex);
 
 		//Top Cap
@@ -171,11 +172,6 @@ namespace kmb {
 		{
 			for (int col = 0; col <= subdivisions; col++)
 			{
-
-				ew::Vec3 normal = ew::Vec3((- 1.0 + (col / subdivisions)), -1.0 + (row / subdivisions)*2, 0);
-				ew::Vec3 a = ew::Vec3(normal.z, normal.x, normal.y);
-				ew::Vec3 b = ew::Cross(normal ,a);
-
 				ew::Vertex v;
 				v.pos = ew::Vec3(width * (col / subdivisions), 0, -height * (row / subdivisions));
 				v.normal = ew::Vec3 (0,1,0);
