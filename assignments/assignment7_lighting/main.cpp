@@ -27,6 +27,19 @@ ew::Vec3 bgColor = ew::Vec3(0.1f);
 ew::Camera camera;
 ew::CameraController cameraController;
 
+struct Light{
+	ew::Vec3 position; //World space
+	ew::Vec3 color; //RGB
+};
+
+struct Material {
+	float ambientK; //Ambient coefficient (0-1)
+	float diffuseK; //Diffuse coefficient (0-1)
+	float specular; //Specular coefficient (0-1)
+	float shininess; //Shininess
+};
+
+
 int main() {
 	printf("Initializing...");
 	if (!glfwInit()) {
@@ -77,6 +90,14 @@ int main() {
 	cylinderTransform.position = ew::Vec3(1.5f, 0.0f, 0.0f);
 
 	resetCamera(camera,cameraController);
+
+	Light lights[4];
+
+	lights[0].position = ew::Vec3(0,2,0);
+	lights[0].color = ew::Vec3(255,255,255);
+
+	shader.setVec3("_Lights[0].position", lights[0].position);
+	shader.setVec3("_Lights[0].color", lights[0].color);
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
