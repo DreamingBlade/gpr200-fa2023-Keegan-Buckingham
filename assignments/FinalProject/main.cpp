@@ -16,11 +16,19 @@ struct Vertex {
 	float u, v;
 };
 
+struct Sprite {
+	float x, y, width, height;
+};
+
 unsigned int createVAO(Vertex* vertexData, int numVertices, unsigned short* indicesData, int numIndices);
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 
 const int SCREEN_WIDTH = 1080;
 const int SCREEN_HEIGHT = 720;
+const int IMG_WIDTH = 381;
+const int IMG_HEIGHT = 253;
+const int SPRITE_WIDTH = 31;
+const int SPRITE_HEIGHT = 31;
 
 Vertex vertices[4] =
 {
@@ -168,8 +176,27 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 	glViewport(0, 0, width, height);
 }
 
-void atlasSpriteSheet()
+void atlasSpriteSheet(float imgWidth, float imgHeight, float characterNumY, float characterNumX, float characterSpritesX, float characterSpritesY)
 {
+	float pixelX = 1.0f / imgWidth;
+	float halfPixelX = pixelX / 2.0f;
+	float pixelY = 1.0f / imgHeight;
+	float halfPixelY = pixelY / 2.0f;
 
+	Sprite catSprites[8][12];
+
+	for (int i = 0; i < characterNumX * characterNumY; i++)
+	{
+		for (int j = 0; j < characterSpritesY; j++)
+		{
+			for (int k = 0; k < characterSpritesX; k++)
+			{
+				catSprites[i][j].x = k*SPRITE_WIDTH;
+				catSprites[i][j].y = j*SPRITE_HEIGHT;
+				catSprites[i][j].height = SPRITE_HEIGHT;
+				catSprites[i][j].width = SPRITE_WIDTH;
+			}
+		}
+	}
 }
 
