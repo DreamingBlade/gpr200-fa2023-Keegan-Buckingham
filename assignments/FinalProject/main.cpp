@@ -73,23 +73,17 @@ int main()
 	glBindVertexArray(quadVAO);
 
 	unsigned int grassTexture = loadTexture("assets/grass.jpg", GL_REPEAT, GL_LINEAR);
-	unsigned int noiseTexture = loadTexture("assets/noise.png", GL_REPEAT, GL_LINEAR);
 	unsigned int characterTexture = loadTexture("assets/character.png", GL_CLAMP_TO_EDGE, GL_LINEAR);
 
 	//Place grass in unit 0
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, grassTexture);
-	//place noiseTexture in unit 1
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, noiseTexture);
 
 	//Place character in unit 2
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, characterTexture);
-	
-	//Make sampler2D _BrickTexture sample from unit 0
+
 	backgroundShader.setInt("_BrickTexture", 0);
-	backgroundShader.setInt("_NoiseTexture", 1);
 	//Make sampler2D _CharacterTexture sample from unit 2
 	characterShader.setInt("_CharacterTexture", 2);
 
@@ -100,7 +94,7 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT);
 		//Both use same quad mesh
 		glBindVertexArray(quadVAO);
- 
+
 		float timePassed = (float)glfwGetTime();
 
 		//Draw background
@@ -150,7 +144,7 @@ unsigned int createVAO(Vertex* vertexData, int numVertices, unsigned short* indi
 	unsigned int vbo;
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex)*numVertices, vertexData, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * numVertices, vertexData, GL_STATIC_DRAW);
 
 	//Element Buffer Object
 	unsigned int ebo;
@@ -159,7 +153,7 @@ unsigned int createVAO(Vertex* vertexData, int numVertices, unsigned short* indi
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * numIndices, indicesData, GL_STATIC_DRAW);
 
 	//Position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex,x));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, x));
 	glEnableVertexAttribArray(0);
 
 	//UV attribute
@@ -172,5 +166,10 @@ unsigned int createVAO(Vertex* vertexData, int numVertices, unsigned short* indi
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
+}
+
+void atlasSpriteSheet()
+{
+
 }
 
