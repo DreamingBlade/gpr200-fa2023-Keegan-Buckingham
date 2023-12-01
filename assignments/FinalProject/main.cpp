@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <math.h>
+#include <iostream>
 
 #include <ew/external/glad.h>
 #include <ew/ewMath/ewMath.h>
@@ -25,10 +26,14 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 
 const int SCREEN_WIDTH = 1080;
 const int SCREEN_HEIGHT = 720;
-const int IMG_WIDTH = 381;
-const int IMG_HEIGHT = 253;
-const int SPRITE_WIDTH = 31;
-const int SPRITE_HEIGHT = 31;
+const float IMG_WIDTH = 381;
+const float IMG_HEIGHT = 253;
+const float SPRITE_WIDTH = 31;
+const float SPRITE_HEIGHT = 31;
+const float CHARACTER_SPRITES_X = 3;
+const float CHARACTER_SPRITES_Y = 4;
+const float NUM_CHARACTERS_ROW = 4;
+const float NUM_ROWS = 2;
 
 Vertex vertices[4] =
 {
@@ -81,7 +86,42 @@ int main()
 	glBindVertexArray(quadVAO);
 
 	unsigned int grassTexture = loadTexture("assets/grass.jpg", GL_REPEAT, GL_LINEAR);
-	unsigned int characterTexture = loadTexture("assets/character.png", GL_CLAMP_TO_EDGE, GL_LINEAR);
+	unsigned int characterTexture = loadTexture("assets/element_cat_sprites.png", GL_CLAMP_TO_EDGE, GL_LINEAR);
+
+	float pixelX = 1.0f / IMG_WIDTH;
+	float halfPixelX = pixelX / 2.0f;
+	float pixelY = 1.0f / IMG_HEIGHT;
+	float halfPixelY = pixelY / 2.0f;
+
+	Sprite catSprites[8][12];
+
+	for (int i = 0; i < NUM_CHARACTERS_ROW * NUM_ROWS; i++)
+	{
+		for (int j = 0; j < CHARACTER_SPRITES_Y; j++)
+		{
+			for (int k = 0; k < CHARACTER_SPRITES_X; k++)
+			{
+				std::cout << i << "  " << j << "  " << k << "\n";
+				if (i < NUM_CHARACTERS_ROW)
+				{
+					catSprites[i][j].x = k * SPRITE_WIDTH;
+					catSprites[i][j].y = j * SPRITE_HEIGHT;
+					catSprites[i][j].height = SPRITE_HEIGHT;
+					catSprites[i][j].width = SPRITE_WIDTH;
+				}
+				else
+				{
+					
+					catSprites[i][j].x = k * SPRITE_WIDTH;
+					catSprites[i][j].y = j * SPRITE_HEIGHT + (SPRITE_HEIGHT * CHARACTER_SPRITES_Y);
+					catSprites[i][j].height = SPRITE_HEIGHT;
+					catSprites[i][j].width = SPRITE_WIDTH;
+				}
+			}
+		}
+	}
+
+	
 
 	//Place grass in unit 0
 	glActiveTexture(GL_TEXTURE0);
@@ -176,27 +216,4 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 	glViewport(0, 0, width, height);
 }
 
-void atlasSpriteSheet(float imgWidth, float imgHeight, float characterNumY, float characterNumX, float characterSpritesX, float characterSpritesY)
-{
-	float pixelX = 1.0f / imgWidth;
-	float halfPixelX = pixelX / 2.0f;
-	float pixelY = 1.0f / imgHeight;
-	float halfPixelY = pixelY / 2.0f;
-
-	Sprite catSprites[8][12];
-
-	for (int i = 0; i < characterNumX * characterNumY; i++)
-	{
-		for (int j = 0; j < characterSpritesY; j++)
-		{
-			for (int k = 0; k < characterSpritesX; k++)
-			{
-				catSprites[i][j].x = k*SPRITE_WIDTH;
-				catSprites[i][j].y = j*SPRITE_HEIGHT;
-				catSprites[i][j].height = SPRITE_HEIGHT;
-				catSprites[i][j].width = SPRITE_WIDTH;
-			}
-		}
-	}
-}
 
