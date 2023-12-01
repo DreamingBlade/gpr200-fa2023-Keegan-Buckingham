@@ -81,12 +81,16 @@ int main()
 	kmb::Shader backgroundShader("assets/background.vert", "assets/background.frag");
 	kmb::Shader characterShader("assets/character.vert", "assets/character.frag");
 
-	unsigned int quadVAO = createVAO(vertices, 4, indices, 6);
+	unsigned int backgroundQuadVAO = createVAO(vertices, 4, indices, 6);
 
-	glBindVertexArray(quadVAO);
+	glBindVertexArray(backgroundQuadVAO);
 
 	unsigned int grassTexture = loadTexture("assets/grass.jpg", GL_REPEAT, GL_LINEAR);
-	unsigned int characterTexture = loadTexture("assets/element_cat_sprites.png", GL_CLAMP_TO_EDGE, GL_LINEAR);
+	//Place grass in unit 0
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, grassTexture);
+
+	backgroundShader.setInt("_BrickTexture", 0);
 
 	float pixelX = 1.0f / IMG_WIDTH;
 	float halfPixelX = pixelX / 2.0f;
@@ -104,16 +108,15 @@ int main()
 				std::cout << i << "  " << j << "  " << k << "\n";
 				if (i < NUM_CHARACTERS_ROW)
 				{
-					catSprites[i][j].x = k * SPRITE_WIDTH;
-					catSprites[i][j].y = j * SPRITE_HEIGHT;
+					catSprites[i][j].x = k * pixelX * SPRITE_WIDTH;
+					catSprites[i][j].y = j * pixelY * SPRITE_HEIGHT;
 					catSprites[i][j].height = SPRITE_HEIGHT;
 					catSprites[i][j].width = SPRITE_WIDTH;
 				}
 				else
 				{
-					
-					catSprites[i][j].x = k * SPRITE_WIDTH;
-					catSprites[i][j].y = j * SPRITE_HEIGHT + (SPRITE_HEIGHT * CHARACTER_SPRITES_Y);
+					catSprites[i][j].x = k * pixelX * SPRITE_WIDTH;
+					catSprites[i][j].y = j * pixelY * SPRITE_HEIGHT + (SPRITE_HEIGHT * CHARACTER_SPRITES_Y);
 					catSprites[i][j].height = SPRITE_HEIGHT;
 					catSprites[i][j].width = SPRITE_WIDTH;
 				}
@@ -121,19 +124,26 @@ int main()
 		}
 	}
 
-	
+	Vertex catVertices[4] =
+	{
+		{catSprites[0][0].x, catSprites[0][0].y - pixelY * SPRITE_HEIGHT, 0.0, 0.0, 0.0},
+		{catSprites[0][0].x + pixelX * SPRITE_WIDTH, catSprites[0][0].y - pixelY * SPRITE_HEIGHT, 0.0, 1.0, 0.0},
+		{catSprites[0][0].x + pixelX * SPRITE_WIDTH, catSprites[0][0].y, 0.0, 1.0, 1.0},
+		{catSprites[0][0].x, catSprites[0][0].y, 0.0, 0.0, 1.0}
+	};
 
-	//Place grass in unit 0
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, grassTexture);
+	unsigned int catQuadVAO = createVAO(vertices, 4, indices, 6);
 
-	//Place character in unit 2
-	glActiveTexture(GL_TEXTURE2);
+	glBindVertexArray(catQuadVAO);
+
+	unsigned int characterTexture = loadTexture("assets/element_cat_sprites.png", GL_CLAMP_TO_EDGE, GL_LINEAR);
+
+
+	//Place character in unit 1
+	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, characterTexture);
-
-	backgroundShader.setInt("_BrickTexture", 0);
-	//Make sampler2D _CharacterTexture sample from unit 2
-	characterShader.setInt("_CharacterTexture", 2);
+	//Make sampler2D _CharacterTexture sample from unit 1
+	characterShader.setInt("_CharacterTexture", 1);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -141,7 +151,7 @@ int main()
 		glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 		//Both use same quad mesh
-		glBindVertexArray(quadVAO);
+		glBindVertexArray(backgroundQuadVAO);
 
 		float timePassed = (float)glfwGetTime();
 
@@ -152,14 +162,15 @@ int main()
 		//setBackgroundShaderUniforms
 		//Make sampler2D _BrickTexture sample from unit 
 		backgroundShader.setInt("_GrassTexture", 0);
-		backgroundShader.setInt("_NoiseTexture", 1);
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
+
+		glBindVertexArray(catQuadVAO);
 
 		characterShader.use();
 		characterShader.setFloat("iTime", timePassed);
 		glBindTexture(GL_TEXTURE_2D, characterTexture);
-		characterShader.setInt("_CharacterTexture", 2);
+		characterShader.setInt("_CharacterTexture", 1);
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
