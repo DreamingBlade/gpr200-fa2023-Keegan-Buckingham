@@ -86,6 +86,10 @@ int main()
 	glBindVertexArray(backgroundQuadVAO);
 
 	unsigned int grassTexture = loadTexture("assets/grass.jpg", GL_REPEAT, GL_LINEAR);
+
+	unsigned int characterTexture = loadTexture("assets/element_cat_sprites.png", GL_CLAMP_TO_EDGE, GL_LINEAR);
+
+	
 	//Place grass in unit 0
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, grassTexture);
@@ -124,21 +128,6 @@ int main()
 		}
 	}
 
-	Vertex catVertices[4] =
-	{
-		{catSprites[0][0].x, catSprites[0][0].y - pixelY * SPRITE_HEIGHT, 0.0, 0.0, 0.0},
-		{catSprites[0][0].x + pixelX * SPRITE_WIDTH, catSprites[0][0].y - pixelY * SPRITE_HEIGHT, 0.0, 1.0, 0.0},
-		{catSprites[0][0].x + pixelX * SPRITE_WIDTH, catSprites[0][0].y, 0.0, 1.0, 1.0},
-		{catSprites[0][0].x, catSprites[0][0].y, 0.0, 0.0, 1.0}
-	};
-
-	unsigned int catQuadVAO = createVAO(vertices, 4, indices, 6);
-
-	glBindVertexArray(catQuadVAO);
-
-	unsigned int characterTexture = loadTexture("assets/element_cat_sprites.png", GL_CLAMP_TO_EDGE, GL_LINEAR);
-
-
 	//Place character in unit 1
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, characterTexture);
@@ -165,7 +154,7 @@ int main()
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 
-		glBindVertexArray(catQuadVAO);
+		//glBindVertexArray(catQuadVAO);
 
 		characterShader.use();
 		characterShader.setFloat("iTime", timePassed);
