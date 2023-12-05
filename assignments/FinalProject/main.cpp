@@ -26,14 +26,17 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 
 const int SCREEN_WIDTH = 1080;
 const int SCREEN_HEIGHT = 720;
-const float IMG_WIDTH = 381;
-const float IMG_HEIGHT = 253;
 const float SPRITE_WIDTH = 31;
 const float SPRITE_HEIGHT = 31;
 const float CHARACTER_SPRITES_X = 3;
 const float CHARACTER_SPRITES_Y = 4;
 const float NUM_CHARACTERS_ROW = 4;
 const float NUM_ROWS = 2;
+//size of the overall spritesheet
+const float IMG_SPRITES_X = CHARACTER_SPRITES_X * NUM_CHARACTERS_ROW;
+const float IMG_SPRITES_Y = CHARACTER_SPRITES_Y * NUM_ROWS;
+const float IMG_WIDTH = IMG_SPRITES_X * SPRITE_WIDTH; // 381;
+const float IMG_HEIGHT = IMG_SPRITES_Y * SPRITE_HEIGHT; // 253;
 
 Vertex vertices[4] =
 {
@@ -101,6 +104,7 @@ int main()
 	float pixelY = 1.0f / IMG_HEIGHT;
 	float halfPixelY = pixelY / 2.0f;
 
+	/*
 	Sprite catSprites[8][12];
 
 	for (int i = 0; i < NUM_CHARACTERS_ROW * NUM_ROWS; i++)
@@ -109,7 +113,6 @@ int main()
 		{
 			for (int k = 0; k < CHARACTER_SPRITES_X; k++)
 			{
-				std::cout << i << "  " << j << "  " << k << "\n";
 				if (i < NUM_CHARACTERS_ROW)
 				{
 					catSprites[i][j].x = k * pixelX * SPRITE_WIDTH;
@@ -127,12 +130,15 @@ int main()
 			}
 		}
 	}
+	*/
 
 	//Place character in unit 1
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, characterTexture);
 	//Make sampler2D _CharacterTexture sample from unit 1
 	characterShader.setInt("_CharacterTexture", 1);
+
+	ew::Vec2 spriteIndex = ew::Vec2(2, 2);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -160,6 +166,11 @@ int main()
 		characterShader.setFloat("iTime", timePassed);
 		glBindTexture(GL_TEXTURE_2D, characterTexture);
 		characterShader.setInt("_CharacterTexture", 1);
+		characterShader.setFloat("_Scale", 1);
+		characterShader.setFloat("_Opacity", 1);
+		characterShader.setVec2("_CharacterPosition", 0.5,0.5);
+		characterShader.setVec2("_SpriteUVCoordinates", spriteIndex.x/IMG_SPRITES_X, spriteIndex.y/IMG_SPRITES_Y);
+		characterShader.setVec2("_SpriteUVSize", SPRITE_WIDTH/IMG_WIDTH/2, SPRITE_HEIGHT/IMG_HEIGHT/2);
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
