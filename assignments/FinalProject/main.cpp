@@ -104,7 +104,7 @@ int main()
 	float pixelY = 1.0f / IMG_HEIGHT;
 	float halfPixelY = pixelY / 2.0f;
 
-	/*
+	
 	Sprite catSprites[8][12];
 
 	for (int i = 0; i < NUM_CHARACTERS_ROW * NUM_ROWS; i++)
@@ -115,22 +115,22 @@ int main()
 			{
 				if (i < NUM_CHARACTERS_ROW)
 				{
-					catSprites[i][j].x = k * pixelX * SPRITE_WIDTH;
-					catSprites[i][j].y = j * pixelY * SPRITE_HEIGHT;
+					catSprites[i][j].x = (k * pixelX * SPRITE_WIDTH) + SPRITE_WIDTH / 2 * pixelX;
+					catSprites[i][j].y = (j * pixelY * SPRITE_HEIGHT) + SPRITE_HEIGHT / 2 * pixelY;
 					catSprites[i][j].height = SPRITE_HEIGHT;
 					catSprites[i][j].width = SPRITE_WIDTH;
 				}
 				else
 				{
-					catSprites[i][j].x = k * pixelX * SPRITE_WIDTH;
-					catSprites[i][j].y = j * pixelY * SPRITE_HEIGHT + (SPRITE_HEIGHT * CHARACTER_SPRITES_Y);
+					catSprites[i][j].x = (k * pixelX * SPRITE_WIDTH) + SPRITE_WIDTH / 2 * pixelX;
+					catSprites[i][j].y = (j * pixelY * SPRITE_HEIGHT) + SPRITE_HEIGHT / 2 * pixelY;
 					catSprites[i][j].height = SPRITE_HEIGHT;
 					catSprites[i][j].width = SPRITE_WIDTH;
 				}
 			}
 		}
 	}
-	*/
+	
 
 	//Place character in unit 1
 	glActiveTexture(GL_TEXTURE1);
@@ -138,7 +138,7 @@ int main()
 	//Make sampler2D _CharacterTexture sample from unit 1
 	characterShader.setInt("_CharacterTexture", 1);
 
-	ew::Vec2 spriteIndex = ew::Vec2(2, 2);
+	ew::Vec2 spriteIndex = ew::Vec2(catSprites[6][1].x, catSprites[6][1].y);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -169,7 +169,7 @@ int main()
 		characterShader.setFloat("_Scale", 1);
 		characterShader.setFloat("_Opacity", 1);
 		characterShader.setVec2("_CharacterPosition", 0.5,0.5);
-		characterShader.setVec2("_SpriteUVCoordinates", spriteIndex.x/IMG_SPRITES_X, spriteIndex.y/IMG_SPRITES_Y);
+		characterShader.setVec2("_SpriteUVCoordinates", spriteIndex.x, spriteIndex.y);
 		characterShader.setVec2("_SpriteUVSize", SPRITE_WIDTH/IMG_WIDTH/2, SPRITE_HEIGHT/IMG_HEIGHT/2);
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
