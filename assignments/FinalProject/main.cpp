@@ -109,24 +109,26 @@ int main()
 
 	for (int i = 0; i < NUM_CHARACTERS_ROW * NUM_ROWS; i++)
 	{
+		int spritePlacement = 0;
 		for (int j = 0; j < CHARACTER_SPRITES_Y; j++)
 		{
 			for (int k = 0; k < CHARACTER_SPRITES_X; k++)
 			{
 				if (i < NUM_CHARACTERS_ROW)
 				{
-					catSprites[i][j].x = (k * pixelX * SPRITE_WIDTH) + SPRITE_WIDTH / 2 * pixelX;
-					catSprites[i][j].y = (j * pixelY * SPRITE_HEIGHT) + SPRITE_HEIGHT / 2 * pixelY;
-					catSprites[i][j].height = SPRITE_HEIGHT;
-					catSprites[i][j].width = SPRITE_WIDTH;
+					catSprites[i][spritePlacement].x = (k * pixelX * SPRITE_WIDTH) + (SPRITE_WIDTH / 2 * pixelX) + (i * CHARACTER_SPRITES_X * SPRITE_WIDTH * pixelX);
+					catSprites[i][spritePlacement].y = (j * pixelY * SPRITE_HEIGHT) + (SPRITE_HEIGHT / 2 * pixelY) - pixelY;
+					catSprites[i][spritePlacement].height = SPRITE_HEIGHT;
+					catSprites[i][spritePlacement].width = SPRITE_WIDTH;
 				}
 				else
 				{
-					catSprites[i][j].x = (k * pixelX * SPRITE_WIDTH) + SPRITE_WIDTH / 2 * pixelX;
-					catSprites[i][j].y = (j * pixelY * SPRITE_HEIGHT) + SPRITE_HEIGHT / 2 * pixelY;
-					catSprites[i][j].height = SPRITE_HEIGHT;
-					catSprites[i][j].width = SPRITE_WIDTH;
+					catSprites[i][spritePlacement].x = (k * pixelX * SPRITE_WIDTH) + (SPRITE_WIDTH / 2 * pixelX) + (i * CHARACTER_SPRITES_X * SPRITE_WIDTH * pixelX) - (NUM_CHARACTERS_ROW * CHARACTER_SPRITES_X * SPRITE_WIDTH * pixelX);
+					catSprites[i][spritePlacement].y = (j * pixelY * SPRITE_HEIGHT) + (SPRITE_HEIGHT / 2 * pixelY) + (CHARACTER_SPRITES_Y * SPRITE_HEIGHT * pixelY) - pixelY;
+					catSprites[i][spritePlacement].height = SPRITE_HEIGHT;
+					catSprites[i][spritePlacement].width = SPRITE_WIDTH;
 				}
+				spritePlacement++;
 			}
 		}
 	}
@@ -138,7 +140,7 @@ int main()
 	//Make sampler2D _CharacterTexture sample from unit 1
 	characterShader.setInt("_CharacterTexture", 1);
 
-	ew::Vec2 spriteIndex = ew::Vec2(catSprites[6][1].x, catSprites[6][1].y);
+	ew::Vec2 spriteIndex = ew::Vec2(catSprites[0][11].x, catSprites[0][11].y);
 
 	while (!glfwWindowShouldClose(window))
 	{
