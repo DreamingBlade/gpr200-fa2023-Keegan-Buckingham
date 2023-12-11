@@ -237,7 +237,7 @@ int main()
 			ImGui::NewFrame();
 
 			ImGui::Begin("Settings");
-			ImGui::DragInt("Cat", &currentCat, 1);
+			ImGui::DragInt("Cat", &currentCat, 1, 0 , 7);
 			ImGui::End();
 
 			ImGui::Render();
