@@ -20,6 +20,14 @@ struct Vertex {
 struct Sprite {
 	float x, y, width, height;
 };
+//Ordered as the sprites appear form top to bottom
+enum Direction
+{
+	UP,
+	RIGHT,
+	LEFT,
+	DOWN
+};
 
 unsigned int createVAO(Vertex* vertexData, int numVertices, unsigned short* indicesData, int numIndices);
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
@@ -37,6 +45,8 @@ const float IMG_SPRITES_X = CHARACTER_SPRITES_X * NUM_CHARACTERS_ROW;
 const float IMG_SPRITES_Y = CHARACTER_SPRITES_Y * NUM_ROWS;
 const float IMG_WIDTH = IMG_SPRITES_X * SPRITE_WIDTH; // 381;
 const float IMG_HEIGHT = IMG_SPRITES_Y * SPRITE_HEIGHT; // 253;
+//How many seconds to stay on each animation frame for
+const float FRAME_LENGTH = 0.3f;
 
 Vertex vertices[4] =
 {
@@ -105,31 +115,16 @@ int main()
 	float halfPixelY = pixelY / 2.0f;
 
 	
-	Sprite catSprites[8][12];
-
-	for (int i = 0; i < NUM_CHARACTERS_ROW * NUM_ROWS; i++)
+	//Creates a 2d array containing every individual sprite. 0,0 is bottom left
+	Sprite catSprites[12][8];
+	for (int x = 0; x < NUM_CHARACTERS_ROW * CHARACTER_SPRITES_X; x++)
 	{
-		int spritePlacement = 0;
-		for (int j = 0; j < CHARACTER_SPRITES_Y; j++)
+		for (int y = 0; y < NUM_ROWS * CHARACTER_SPRITES_Y; y++)
 		{
-			for (int k = 0; k < CHARACTER_SPRITES_X; k++)
-			{
-				if (i < NUM_CHARACTERS_ROW)
-				{
-					catSprites[i][spritePlacement].x = (k * pixelX * SPRITE_WIDTH) + (SPRITE_WIDTH / 2 * pixelX) + (i * CHARACTER_SPRITES_X * SPRITE_WIDTH * pixelX);
-					catSprites[i][spritePlacement].y = (j * pixelY * SPRITE_HEIGHT) + (SPRITE_HEIGHT / 2 * pixelY) - pixelY;
-					catSprites[i][spritePlacement].height = SPRITE_HEIGHT;
-					catSprites[i][spritePlacement].width = SPRITE_WIDTH;
-				}
-				else
-				{
-					catSprites[i][spritePlacement].x = (k * pixelX * SPRITE_WIDTH) + (SPRITE_WIDTH / 2 * pixelX) + (i * CHARACTER_SPRITES_X * SPRITE_WIDTH * pixelX) - (NUM_CHARACTERS_ROW * CHARACTER_SPRITES_X * SPRITE_WIDTH * pixelX);
-					catSprites[i][spritePlacement].y = (j * pixelY * SPRITE_HEIGHT) + (SPRITE_HEIGHT / 2 * pixelY) + (CHARACTER_SPRITES_Y * SPRITE_HEIGHT * pixelY) - pixelY;
-					catSprites[i][spritePlacement].height = SPRITE_HEIGHT;
-					catSprites[i][spritePlacement].width = SPRITE_WIDTH;
-				}
-				spritePlacement++;
-			}
+			catSprites[x][y].x = (x * pixelX * SPRITE_WIDTH) + (SPRITE_WIDTH / 2 * pixelY);
+			catSprites[x][y].y = (y * pixelY * SPRITE_HEIGHT) + (SPRITE_HEIGHT / 2 * pixelY);
+			catSprites[x][y].height = SPRITE_HEIGHT;
+			catSprites[x][y].width = SPRITE_WIDTH;
 		}
 	}
 	
@@ -140,8 +135,16 @@ int main()
 	//Make sampler2D _CharacterTexture sample from unit 1
 	characterShader.setInt("_CharacterTexture", 1);
 
-	ew::Vec2 spriteIndex = ew::Vec2(catSprites[0][11].x, catSprites[0][11].y);
+	float frameTime = 0;
 
+	int direction = (int)DOWN;
+	int frame = 0;
+
+	//How much time passed since beginning of game, and how much time passed last frame. Used for deltaTime
+	float timePassed = 0;
+	float lastFrameTimePassed = 0;
+
+	//Main Loop
 	while (!glfwWindowShouldClose(window))
 	{
 		glfwPollEvents();
@@ -150,7 +153,21 @@ int main()
 		//Both use same quad mesh
 		glBindVertexArray(backgroundQuadVAO);
 
-		float timePassed = (float)glfwGetTime();
+		//Checks if you've been on this frame long enough to animate.
+		timePassed = (float)glfwGetTime();
+		//Adds delta time to frame time
+		frameTime += timePassed - lastFrameTimePassed;
+		lastFrameTimePassed = timePassed;
+		//If you have been here long enough, increments frame
+		if (frameTime >= FRAME_LENGTH)
+		{
+			frameTime -= FRAME_LENGTH;
+			frame += 1;
+			if (frame >= CHARACTER_SPRITES_X)
+			{
+				frame = 0;
+			}
+		}
 
 		//Draw background
 		backgroundShader.use();
@@ -162,7 +179,15 @@ int main()
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 
-		//glBindVertexArray(catQuadVAO);
+
+		//Which cat we're displaying
+		ew::Vec2 catIndex = ew::Vec2(3, 1);
+		//Which individual sprite that translates to
+		ew::Vec2 spriteIndex = ew::Vec2(catIndex.x * CHARACTER_SPRITES_X + (int)frame, catIndex.y * CHARACTER_SPRITES_Y + (int)direction);
+		//Where on the sheet that sprite is located
+		ew::Vec2 spritePos = ew::Vec2(catSprites[(int)spriteIndex.x][(int)spriteIndex.y].x, catSprites[(int)spriteIndex.x][(int)spriteIndex.y].y);
+
+
 
 		characterShader.use();
 		characterShader.setFloat("iTime", timePassed);
@@ -171,7 +196,7 @@ int main()
 		characterShader.setFloat("_Scale", 1);
 		characterShader.setFloat("_Opacity", 1);
 		characterShader.setVec2("_CharacterPosition", 0.5,0.5);
-		characterShader.setVec2("_SpriteUVCoordinates", spriteIndex.x, spriteIndex.y);
+		characterShader.setVec2("_SpriteUVCoordinates", spritePos.x, spritePos.y);
 		characterShader.setVec2("_SpriteUVSize", SPRITE_WIDTH/IMG_WIDTH/2, SPRITE_HEIGHT/IMG_HEIGHT/2);
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
@@ -179,18 +204,21 @@ int main()
 
 
 		//Render UI
+		/*
 		{
 			ImGui_ImplGlfw_NewFrame();
 			ImGui_ImplOpenGL3_NewFrame();
 			ImGui::NewFrame();
 
 			ImGui::Begin("Settings");
+			ImGui::DragInt("Direction", &direction, 1.0f, 0, 3);
+			ImGui::DragInt("Frame", &frame, 1.0f, 0, 2);
 			ImGui::End();
 
 			ImGui::Render();
 			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		}
-
+		*/
 		glfwSwapBuffers(window);
 	}
 	printf("Shutting down...");
@@ -228,5 +256,4 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
 }
-
 
