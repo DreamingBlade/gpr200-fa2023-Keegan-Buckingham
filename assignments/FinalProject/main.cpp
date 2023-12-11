@@ -12,14 +12,7 @@
 #include <kmb/shader.h>
 #include <kmb/texture.h>
 
-struct Vertex {
-	float x, y, z;
-	float u, v;
-};
-
-struct Sprite {
-	float x, y, width, height;
-};
+////ISAAC////
 //Ordered as the sprites appear form top to bottom
 enum Direction
 {
@@ -28,6 +21,19 @@ enum Direction
 	LEFT,
 	DOWN
 };
+
+
+////KEEGAN////
+struct Vertex {
+	float x, y, z;
+	float u, v;
+};
+
+struct Sprite {
+	float x, y, width, height;
+};
+
+
 
 unsigned int createVAO(Vertex* vertexData, int numVertices, unsigned short* indicesData, int numIndices);
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
@@ -42,6 +48,8 @@ const float CHARACTER_SPRITES_X = 3;
 const float CHARACTER_SPRITES_Y = 4;
 const float NUM_CHARACTERS_ROW = 4;
 const float NUM_ROWS = 2;
+
+////ISAAC////
 //size of the overall spritesheet
 const float IMG_SPRITES_X = CHARACTER_SPRITES_X * NUM_CHARACTERS_ROW;
 const float IMG_SPRITES_Y = CHARACTER_SPRITES_Y * NUM_ROWS;
@@ -52,6 +60,7 @@ const float FRAME_LENGTH = 0.2f;
 const float MOVE_SPEED = 0.15f;
 
 
+////KEEGAN////
 Vertex vertices[4] =
 {
 	{-1.0, -1.0, 0.0, 0.0, 0.0},
@@ -119,7 +128,8 @@ int main()
 	float halfPixelX = pixelX / 2.0f;
 	float halfPixelY = pixelY / 2.0f;
 
-	
+
+	////ISAAC & KEEGAN////
 	//Creates a 2d array containing every individual sprite. 0,0 is bottom left
 	Sprite catSprites[12][8];
 	for (int x = 0; x < NUM_CHARACTERS_ROW * CHARACTER_SPRITES_X; x++)
@@ -133,6 +143,7 @@ int main()
 		}
 	}
 
+	////KEEGAN////
 	//Place character in unit 1
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, characterTexture);
@@ -143,6 +154,8 @@ int main()
 	//Which cat we're displaying
 	ew::Vec2 catIndex = ew::Vec2(0, 0);
 
+
+	////ISAAC////
 	int direction = (int)RIGHT;
 	int frame = 0;
 
@@ -182,6 +195,7 @@ int main()
 			}
 		}
 
+		////KEEGAN////
 		//Draw background
 		backgroundShader.use();
 		//backgroundShader.setFloat("iTime", timePassed);
@@ -191,7 +205,8 @@ int main()
 		backgroundShader.setInt("_GrassTexture", 0);
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
-		 
+
+		////ISAAC////
 		//Which sprite to use, and where that's located on the sheet
 		ew::Vec2 spriteIndex = ew::Vec2(catIndex.x * CHARACTER_SPRITES_X + frame, catIndex.y * CHARACTER_SPRITES_Y + (int)direction);
 		ew::Vec2 spritePos = ew::Vec2(catSprites[(int)spriteIndex.x][(int)spriteIndex.y].x, catSprites[(int)spriteIndex.x][(int)spriteIndex.y].y);
@@ -200,6 +215,7 @@ int main()
 		characterUVPos = move((Direction)direction, characterUVPos, MOVE_SPEED * deltaTime);
 		direction = checkDirection((Direction)direction, characterUVPos);
 
+		////KEEGAN////
 		//Draws the cat
 		characterShader.use();
 		characterShader.setFloat("iTime", timePassed);
@@ -282,6 +298,7 @@ int main()
 	printf("Shutting down...");
 }
 
+////KEEGAN////
 unsigned int createVAO(Vertex* vertexData, int numVertices, unsigned short* indicesData, int numIndices) {
 	unsigned int vao;
 	glGenVertexArrays(1, &vao);
@@ -310,11 +327,13 @@ unsigned int createVAO(Vertex* vertexData, int numVertices, unsigned short* indi
 	return vao;
 }
 
+////KEEGAN////
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
 }
 
+////ISAAC////
 //Returns a new position in the correct direction
 ew::Vec2 move(Direction direction, ew::Vec2 position, float distance)
 {
@@ -337,6 +356,7 @@ ew::Vec2 move(Direction direction, ew::Vec2 position, float distance)
 	return position;
 }
 
+////ISAAC////
 //Returns the direction to keep moving in
 Direction checkDirection(Direction direction, ew::Vec2 position)
 {
