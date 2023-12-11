@@ -13,6 +13,7 @@ uniform float _Opacity;
 
 uniform float iTime;
 
+////ISAAC////
 void main(){
 
 	vec2 UV_sample = UV; //this variable is which part of the texture it actually uses
