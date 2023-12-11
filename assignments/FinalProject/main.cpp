@@ -140,9 +140,9 @@ int main()
 	//Make sampler2D _CharacterTexture sample from unit 1
 	characterShader.setInt("_CharacterTexture", 1);
 
-
+	int currentCat = 0;
 	//Which cat we're displaying
-	ew::Vec2 catIndex = ew::Vec2(0, 0);
+	ew::Vec2 catIndex = ew::Vec2(currentCat, 0);
 
 	int direction = (int)RIGHT;
 	int frame = 0;
@@ -190,7 +190,7 @@ int main()
 		backgroundShader.setInt("_GrassTexture", 0);
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
-
+		catIndex = ew::Vec2(currentCat, 0);
 
 		//Which sprite to use, and where that's located on the sheet
 		ew::Vec2 spriteIndex = ew::Vec2(catIndex.x * CHARACTER_SPRITES_X + frame, catIndex.y * CHARACTER_SPRITES_Y + (int)direction);
@@ -214,6 +214,28 @@ int main()
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+		//Render UI
+		{
+			ImGui_ImplGlfw_NewFrame();
+			ImGui_ImplOpenGL3_NewFrame();
+			ImGui::NewFrame();
+
+			ImGui::Begin("Settings");
+			ImGui::DragInt("Cat", &currentCat, 1.0f);
+			ImGui::End();
+
+			ImGui::Render();
+			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		}
+
+		if (currentCat > 3)
+		{
+			currentCat = 3;
+		}
+		if (currentCat < 0)
+		{
+			currentCat = 0;
+		}
 
 		glfwSwapBuffers(window);
 	}
