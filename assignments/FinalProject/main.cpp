@@ -126,7 +126,7 @@ int main()
 	{
 		for (int y = 0; y < NUM_ROWS * CHARACTER_SPRITES_Y; y++)
 		{
-			catSprites[x][y].x = (x * pixelX * SPRITE_WIDTH) + (SPRITE_WIDTH / 2 * pixelY);
+			catSprites[x][y].x = (x * pixelX * SPRITE_WIDTH) + (SPRITE_WIDTH / 2 * pixelX);
 			catSprites[x][y].y = (y * pixelY * SPRITE_HEIGHT) + (SPRITE_HEIGHT / 2 * pixelY);
 			catSprites[x][y].height = SPRITE_HEIGHT;
 			catSprites[x][y].width = SPRITE_WIDTH;
@@ -142,7 +142,7 @@ int main()
 
 
 	//Which cat we're displaying
-	ew::Vec2 catIndex = ew::Vec2(0, 1);
+	ew::Vec2 catIndex = ew::Vec2(0, 0);
 
 	int direction = (int)RIGHT;
 	int frame = 0;
@@ -192,14 +192,15 @@ int main()
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 
 
-		//Which individual sprite that translates to
+		//Which sprite to use, and where that's located on the sheet
 		ew::Vec2 spriteIndex = ew::Vec2(catIndex.x * CHARACTER_SPRITES_X + frame, catIndex.y * CHARACTER_SPRITES_Y + (int)direction);
-		//Where on the sheet that sprite is located
 		ew::Vec2 spritePos = ew::Vec2(catSprites[(int)spriteIndex.x][(int)spriteIndex.y].x, catSprites[(int)spriteIndex.x][(int)spriteIndex.y].y);
 
+		//Moves the cat
 		characterUVPos = move((Direction)direction, characterUVPos, MOVE_SPEED * deltaTime);
 		direction = checkDirection((Direction)direction, characterUVPos);
 
+		//Draws the cat
 		characterShader.use();
 		characterShader.setFloat("iTime", timePassed);
 		glBindTexture(GL_TEXTURE_2D, characterTexture);
@@ -214,22 +215,6 @@ int main()
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 
-		//Render UI
-		/*
-		{
-			ImGui_ImplGlfw_NewFrame();
-			ImGui_ImplOpenGL3_NewFrame();
-			ImGui::NewFrame();
-
-			ImGui::Begin("Settings");
-			ImGui::DragInt("Direction", &direction, 1.0f, 0, 3);
-			ImGui::DragInt("Frame", &frame, 1.0f, 0, 2);
-			ImGui::End();
-
-			ImGui::Render();
-			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-		}
-		*/
 		glfwSwapBuffers(window);
 	}
 	printf("Shutting down...");
