@@ -137,7 +137,7 @@ int main()
 
 	float frameTime = 0;
 
-	int direction = (int)DOWN;
+	int direction = (int)RIGHT;
 	int frame = 0;
 
 	//How much time passed since beginning of game, and how much time passed last frame. Used for deltaTime
@@ -181,9 +181,9 @@ int main()
 
 
 		//Which cat we're displaying
-		ew::Vec2 catIndex = ew::Vec2(3, 1);
+		ew::Vec2 catIndex = ew::Vec2(0, 1);
 		//Which individual sprite that translates to
-		ew::Vec2 spriteIndex = ew::Vec2(catIndex.x * CHARACTER_SPRITES_X + (int)frame, catIndex.y * CHARACTER_SPRITES_Y + (int)direction);
+		ew::Vec2 spriteIndex = ew::Vec2(catIndex.x * CHARACTER_SPRITES_X + frame, catIndex.y * CHARACTER_SPRITES_Y + (int)direction);
 		//Where on the sheet that sprite is located
 		ew::Vec2 spritePos = ew::Vec2(catSprites[(int)spriteIndex.x][(int)spriteIndex.y].x, catSprites[(int)spriteIndex.x][(int)spriteIndex.y].y);
 
