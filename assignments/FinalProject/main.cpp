@@ -132,7 +132,6 @@ int main()
 			catSprites[x][y].width = SPRITE_WIDTH;
 		}
 	}
-	
 
 	//Place character in unit 1
 	glActiveTexture(GL_TEXTURE1);
@@ -142,7 +141,7 @@ int main()
 
 	int currentCat = 0;
 	//Which cat we're displaying
-	ew::Vec2 catIndex = ew::Vec2(currentCat, 0);
+	ew::Vec2 catIndex = ew::Vec2(0, 0);
 
 	int direction = (int)RIGHT;
 	int frame = 0;
@@ -154,6 +153,8 @@ int main()
 	float lastFrameTimePassed = 0;
 
 	float frameTime = 0;
+
+	int previousCat = currentCat;
 
 	//Main Loop
 	while (!glfwWindowShouldClose(window))
@@ -190,8 +191,7 @@ int main()
 		backgroundShader.setInt("_GrassTexture", 0);
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
-		catIndex = ew::Vec2(currentCat, 0);
-
+		 
 		//Which sprite to use, and where that's located on the sheet
 		ew::Vec2 spriteIndex = ew::Vec2(catIndex.x * CHARACTER_SPRITES_X + frame, catIndex.y * CHARACTER_SPRITES_Y + (int)direction);
 		ew::Vec2 spritePos = ew::Vec2(catSprites[(int)spriteIndex.x][(int)spriteIndex.y].x, catSprites[(int)spriteIndex.x][(int)spriteIndex.y].y);
@@ -221,21 +221,61 @@ int main()
 			ImGui::NewFrame();
 
 			ImGui::Begin("Settings");
-			ImGui::DragInt("Cat", &currentCat, 1.0f);
+			ImGui::DragInt("Cat", &currentCat, 1);
 			ImGui::End();
 
 			ImGui::Render();
 			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		}
 
-		if (currentCat > 3)
+		if(currentCat > 7)
 		{
-			currentCat = 3;
+			currentCat = 7;
 		}
-		if (currentCat < 0)
+		else if (currentCat < 0)
 		{
 			currentCat = 0;
 		}
+
+		if (currentCat != previousCat)
+		{
+			if (currentCat == 0)
+			{
+				catIndex = ew::Vec2(0, 0);
+			}
+			if (currentCat == 1)
+			{
+				catIndex = ew::Vec2(1, 0);
+			}
+			if (currentCat == 2)
+			{
+				catIndex = ew::Vec2(2, 0);
+			}
+			if (currentCat == 3)
+			{
+				catIndex = ew::Vec2(3, 0);
+			}
+			if (currentCat == 4)
+			{
+				catIndex = ew::Vec2(0, 1);
+			}
+			if (currentCat == 5)
+			{
+				catIndex = ew::Vec2(1, 1);
+			}
+			if (currentCat == 6)
+			{
+				catIndex = ew::Vec2(2, 1);
+			}
+			if (currentCat == 7)
+			{
+				catIndex = ew::Vec2(3, 1);
+			}
+		}
+
+
+
+		std::cout << catIndex.x * CHARACTER_SPRITES_X + frame << "  " << catIndex.y * CHARACTER_SPRITES_Y + (int)direction << "\n";
 
 		glfwSwapBuffers(window);
 	}
